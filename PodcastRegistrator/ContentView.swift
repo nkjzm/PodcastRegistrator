@@ -82,7 +82,7 @@ struct ContentView: View {
         openPanel.canChooseDirectories    = false   //ディレクトリの選択
         openPanel.canCreateDirectories    = false   //ディレクトリの作成
         openPanel.canChooseFiles          = true    //ファイルの選択
-        openPanel.allowedFileTypes        = ["wav"] //ファイルの種類
+        openPanel.allowedFileTypes        = ["wav", "mp3"] //ファイルの種類
         
         let reault = openPanel.runModal()
         if( reault == NSApplication.ModalResponse.OK ) {
