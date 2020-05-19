@@ -19,9 +19,7 @@ struct ContentView: View {
         let task = Process()
         task.launchPath = "/bin/sh"
         task.arguments = ["-c", "/usr/local/bin/ffmpeg -i \"\(path)\" -f mp3 -b:a 192k \(audioRootPath)/tmp.mp3 -y; /usr/local/bin/ffmpeg -i \(audioRootPath)/tmp.mp3 -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename); rm \(audioRootPath)/tmp.mp3"]
-        task.terminationHandler = { _ in
-            callback() 
-        }
+        task.terminationHandler = { _ in callback()}
         // コマンド実行
         task.launch()
     }
@@ -114,9 +112,9 @@ struct ContentView: View {
     func ConvertAndUpload()->Void{
         let episodeNumber = Int(self.number)!
         let audioFilename = "xrfm_\(String(format: "%03d", episodeNumber)).mp3";
-
+        
         self.progress = "音声ファイルを変換しています"
-
+        
         // 音声ファイルの変換
         self.ConvertToMp3(path: self.audioPath, filename: audioFilename, callback: {
             
@@ -128,9 +126,9 @@ struct ContentView: View {
             
             // mdファイルを作成
             self.Touch(filename: mdFilename)
-                        
+            
             self.progress = "mdファイルを生成しています"
-
+            
             // 音声ファイルのサイズ取得
             self.GetFileSize(filename: audioFilename, callback: { out in
                 
@@ -171,9 +169,9 @@ struct ContentView: View {
                 
                 // mdファイルに書き込み
                 self.SaveFile(filename: mdFilename, message: message, callback: {
-
+                    
                     self.progress = "アップロード中"
-
+                    
                     // Gitリポジトリにアップロード
                     self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
                         self.progress = "アップロード完了!"
