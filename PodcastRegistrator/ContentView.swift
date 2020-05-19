@@ -18,7 +18,14 @@ struct ContentView: View {
     func ConvertToMp3(path : String ,filename : String, callback: @escaping () -> Void) -> Void {
         let task = Process()
         task.launchPath = "/bin/sh"
-        task.arguments = ["-c", "/usr/local/bin/ffmpeg -i \"\(path)\" -f mp3 -b:a 192k \(audioRootPath)/tmp.mp3 -y; /usr/local/bin/ffmpeg -i \(audioRootPath)/tmp.mp3 -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename); rm \(audioRootPath)/tmp.mp3"]
+        let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof noise.prof;"
+        let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" noise_removed.wav noisered noise.prof 0.2;"
+        let compressArg = "/usr/local/bin/sox noise_removed.wav compressed.wav compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
+        let removeSilenceArg = "/usr/local/bin/sox compressed.wav silence_removed.wav silence -l 1 0.1 1% -1 0.8 15%;"
+        let convertArg = "/usr/local/bin/ffmpeg -i silence_removed.wav -f mp3 -b:a 192k tmp.mp3 -y;"
+        let addArtworkArg = "/usr/local/bin/ffmpeg -i tmp.mp3 -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename);"
+        let removeFilesArg = "rm noise.prof noise_removed.wav compressed.wav silence_removed.wav tmp.mp3;"
+        task.arguments = ["-c", createNoiseprofArg + removeNoiseArg + compressArg + removeSilenceArg + convertArg + addArtworkArg + removeFilesArg]
         task.terminationHandler = { _ in callback()}
         // コマンド実行
         task.launch()
