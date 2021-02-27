@@ -49,7 +49,8 @@ struct ContentView: View {
         task.launchPath = "/usr/bin/wc"
         // オプションを指定
         task.arguments = ["-c", "\(audioRootPath)/\(filename)"]
-        
+        print(task.arguments)
+
         let pipe = Pipe()
         task.standardOutput = pipe
         
@@ -136,6 +137,8 @@ struct ContentView: View {
             
             self.progress = "mdファイルを生成しています"
             
+            print("GetFileSize前")
+            
             // 音声ファイルのサイズ取得
             self.GetFileSize(filename: audioFilename, callback: { out in
                 
@@ -180,9 +183,9 @@ struct ContentView: View {
                     self.progress = "アップロード中"
                     
                     // Gitリポジトリにアップロード
-                    self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
+                    //self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
                         self.progress = "アップロード完了!"
-                    })
+                    //})
                 })
             })
         })
