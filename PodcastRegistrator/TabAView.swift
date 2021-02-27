@@ -200,9 +200,9 @@ struct TabAView: View {
                     self.progress = "アップロード中"
                     
                     // Gitリポジトリにアップロード
-                    //self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
+                    self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
                     self.progress = "アップロード完了!"
-                    //})
+                    })
                 })
             })
         })
