@@ -16,9 +16,10 @@ struct ContentView: View {
                 .tabItem {
                     VStack {
 //                        Image(systemName: "bold")
-                        Text("TabB")
+                        Text("コンバーター")
+                        
                     }
-            }.tag(2)
+            }.tag(2).frame(width: 500)
         }
     }
     

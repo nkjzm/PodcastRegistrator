@@ -245,18 +245,18 @@ struct TabAView: View {
                 Spacer()
                 TextField("エピソードの説明を入力", text: $description)
             }
-            HStack(alignment: .center){
-                Text("進捗状況")
-                    .frame(width: 100)
-                Spacer()
-                Text(verbatim: progress)
-            }
             Button(action: {
                 self.ConvertAndUpload()
             }) {
                 Text("アップロード")
+            }.padding()
+            HStack(alignment: .center){
+                Text("進捗状況")
+                    .frame(width: 100)
+                Text(verbatim: progress)
+                Spacer()
             }
-        }.padding().frame(width: 500)
+        }.padding().frame(width: 400)
     }
 }
 
