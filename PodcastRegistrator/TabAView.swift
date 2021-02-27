@@ -99,7 +99,7 @@ struct TabAView: View {
     }
     
     // オーディオファイルを開く
-    func OpenAudio() -> String {
+    static func OpenAudio() -> String {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false   //複数ファイルの選択
         openPanel.canChooseDirectories    = false   //ディレクトリの選択
@@ -135,9 +135,9 @@ struct TabAView: View {
     
     // 音声ファイルを変換してGitリポジトリにアップロード
     func ConvertAndUpload()->Void{
-        let episodeNumber = Int(self.number)!
-        let audioFilename = "xrfm_\(String(format: "%03d", episodeNumber)).mp3";
-        
+        let episodeNumber = Int(number)!
+        let audioFilename = TabBView.GetAudioName(number: self.number)
+
         self.progress = "音声ファイルを変換しています"
         
         // 音声ファイルの変換
@@ -217,7 +217,7 @@ struct TabAView: View {
                     .frame(width: 100)
                 Text("\(self.audioPath)").frame(maxWidth: .infinity)
                 Button(action: {
-                    self.audioPath = self.OpenAudio()
+                    self.audioPath = TabAView.OpenAudio()
                 }){
                     Text("オーディオファイルを開く")
                 }
