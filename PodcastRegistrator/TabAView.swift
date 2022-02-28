@@ -38,7 +38,7 @@ struct TabAView: View {
         let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof \(noiseProf);"
         let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
         //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
-        let removeSilenceArg = "/usr/local/bin/sox \(noiseRemoved) \(silenceRemoved) silence -l 1 0.1 1% -1 0.8 15%;"
+        let removeSilenceArg = "/usr/local/bin/sox \(noiseRemoved) \(silenceRemoved) silence -l 1 0.2 0% -1 0.8 0%;"
         let convertArg = "/usr/local/bin/ffmpeg -i \(silenceRemoved) -f mp3 -b:a 192k \(formatConverted) -y;"
         let addArtworkArg = "/usr/local/bin/ffmpeg -i \(formatConverted) -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename);"
         let removeFilesArg = "rm \(noiseProf) \(noiseRemoved) \(silenceRemoved) \(formatConverted);"
