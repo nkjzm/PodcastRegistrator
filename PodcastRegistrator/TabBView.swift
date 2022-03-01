@@ -109,6 +109,11 @@ struct TabBView: View {
         return "xrfm_\(String(format: "%03d", episodeNumber))_raw.mp3"
     }
     
+    static func GetMovieName(number : String) -> String {
+        let episodeNumber = Int(number)!
+        return "xrfm_\(String(format: "%03d", episodeNumber)).mp4"
+    }
+    
     var body: some View {
         
         VStack {

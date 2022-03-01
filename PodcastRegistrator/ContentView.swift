@@ -20,6 +20,15 @@ struct ContentView: View {
                         
                     }
             }.tag(2).frame(width: 500)
+            TabCView()
+                .tabItem {
+                    VStack {
+//                        Image(systemName: "bold")
+                        Text("動画に変換")
+                        
+                    }
+            }.tag(3).frame(width: 500)
+
         }
     }
     
