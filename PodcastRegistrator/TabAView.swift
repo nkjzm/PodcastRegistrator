@@ -12,16 +12,17 @@ import AVFoundation
 
 struct TabAView: View {
     
-    @State private var number : String  = ""
+    @State private var enableConvert : Bool = true
+    @State private var episodeNumber : Int = 0
     @State private var audioPath : String = "未選択"
     @State private var title : String = ""
     @State private var description : String = ""
     @State private var progress : String = "処理開始前"
     @State var date = Date()
     
-    let gitRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io"
-    let audioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
-    let mdRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
+    let gitRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/docs"
+    let audioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/docs/audio"
+    let mdRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_posts"
     let artworkPath : String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     
     // wavファイルを変換してアートワークを設定する
@@ -125,7 +126,7 @@ struct TabAView: View {
         // 起動するプログラムを絶対パスで指定
         task.launchPath = "/bin/sh"
         // オプションを指定
-        task.arguments = ["-c", "cd \(gitRootPath); pwd; git add \(audioRootPath)/\(audioFilename); git add \(mdRootPath)/\(mdFilename); git commit -m \"Add \(count)\"; git push origin master"]
+        task.arguments = ["-c", "cd \(gitRootPath); pwd; git add \(audioRootPath)/\(audioFilename); git add \(mdRootPath)/\(mdFilename); git commit -m \"Add \(count)\"; git push origin main"]
         task.terminationHandler = { _ in
             callback()
         }
@@ -135,78 +136,99 @@ struct TabAView: View {
     
     // 音声ファイルを変換してGitリポジトリにアップロード
     func ConvertAndUpload()->Void{
-        let episodeNumber = Int(number)!
-        let audioFilename = TabBView.GetAudioName(number: self.number)
-
+        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+        
         self.progress = "音声ファイルを変換しています"
         
-        // 音声ファイルの変換
-        self.ConvertToMp3(path: self.audioPath, filename: audioFilename, callback: {
+        if(enableConvert){
+            // 音声ファイルの変換
+            self.ConvertToMp3(path: self.audioPath, filename: audioFilename, callback: {self.MakeMarkdown()})
+        }else{
+            self.MakeMarkdown()
+        }
+    }
+    
+    func getDateStr()->String{
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd" // 日付フォーマットの設定
+        return dateFormatter.string(from: self.date)
+    }
+    
+    func getMdFilename()->String{
+        let dateStr = getDateStr()
+        return "\(dateStr)-\(episodeNumber).md"
+    }
+    
+    func MakeMarkdown(){
+        // mdファイルの名前を取得
+        let mdFilename = getMdFilename()
+        
+        // mdファイルを作成
+        self.Touch(filename: mdFilename)
+        
+        self.progress = "mdファイルを生成しています"
+        
+        print("GetFileSize前")
+
+        // 音声ファイルのサイズ取得
+        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+        self.GetFileSize(filename: audioFilename, callback: { out in
+            self.SetMarkdown(sizeStr: out)
+        })
+    }
+    
+    func SetMarkdown(sizeStr : String)
+    {
+        // サイズをMB表記に変換
+        let size = String(format: "%.01f", Float(sizeStr)!/1000000)
+        
+        // 音声の長さを取得
+        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+        let asset = AVURLAsset(url: URL(fileURLWithPath: "\(self.audioRootPath)/\(audioFilename)"))
+        let duration =  Double(CMTimeGetSeconds(asset.duration))
+        
+        // 秒数を時間に整形
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .positional
+        formatter.allowedUnits = [.minute,.hour,.second]
+        let outputString = formatter.string(from: duration)!
+        
+        let dateStr = getDateStr()
+        let message = """
+            ---
+            actor_ids:
+            - ikkou
+            - nkjzm
+            audio_file_path: /audio/\(audioFilename)
+            audio_file_size: \(size) MB
+            date: \(dateStr) 00:00:00 +0900
+            description: "\(self.description)"
+            duration: "\(outputString)"
+            layout: article
+            title: 第\(episodeNumber)回「\(self.title)」
+            ---
             
-            // mdファイルの名前を取得
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd" // 日付フォーマットの設定
-            let dateStr = dateFormatter.string(from: self.date)
-            let mdFilename = "\(dateStr)-\(episodeNumber).md"
+            ## 関連リンク
             
-            // mdファイルを作成
-            self.Touch(filename: mdFilename)
+            - 公式Twitter: [@xRfrn](https://twitter.com/xrfrn)
+            - ハッシュタグ: [#xRfm](https://twitter.com/hashtag/xRfm?src=hash)
+            """
+        
+        self.progress = "mdファイルを書き込んでいます"
+        
+        // mdファイルに書き込み
+        let mdFilename = getMdFilename()
+        self.SaveFile(filename: mdFilename, message: message, callback: {
             
-            self.progress = "mdファイルを生成しています"
+            self.progress = "アップロード中"
             
-            print("GetFileSize前")
-            
-            // 音声ファイルのサイズ取得
-            self.GetFileSize(filename: audioFilename, callback: { out in
-                
-                // サイズをMB表記に変換
-                let size = String(format: "%.01f", Float(out)!/1000000)
-                
-                // 音声の長さを取得
-                let asset = AVURLAsset(url: URL(fileURLWithPath: "\(self.audioRootPath)/\(audioFilename)"))
-                let duration =  Double(CMTimeGetSeconds(asset.duration))
-                
-                // 秒数を時間に整形
-                let formatter = DateComponentsFormatter()
-                formatter.unitsStyle = .positional
-                formatter.allowedUnits = [.minute,.hour,.second]
-                let outputString = formatter.string(from: duration)!
-                
-                let message = """
-                ---
-                actor_ids:
-                - ikkou
-                - nkjzm
-                audio_file_path: /audio/\(audioFilename)
-                audio_file_size: \(size) MB
-                date: \(dateStr) 00:00:00 +0900
-                description: "\(self.description)"
-                duration: "\(outputString)"
-                layout: article
-                title: 第\(episodeNumber)回「\(self.title)」
-                ---
-                
-                ## 関連リンク
-                
-                - 公式Twitter: [@xRfrn](https://twitter.com/xrfrn)
-                - ハッシュタグ: [#xRfm](https://twitter.com/hashtag/xRfm?src=hash)
-                """
-                
-                self.progress = "mdファイルを書き込んでいます"
-                
-                // mdファイルに書き込み
-                self.SaveFile(filename: mdFilename, message: message, callback: {
-                    
-                    self.progress = "アップロード中"
-                    
-                    // Gitリポジトリにアップロード
-                    self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
-                    self.progress = "アップロード完了!"
-                    })
-                })
+            // Gitリポジトリにアップロード
+            self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
+                self.progress = "アップロード完了!"
             })
         })
     }
+    
     
     var body: some View {
         VStack {
@@ -225,7 +247,7 @@ struct TabAView: View {
             HStack(alignment: .center){
                 Text("回数")
                     .frame(width: 100)
-                TextField("0", text: $number)
+                TextField("0", value: $episodeNumber, formatter: NumberFormatter())
             }
             DatePicker(selection: $date,
                        in: ...Date(), displayedComponents: .date
@@ -245,6 +267,9 @@ struct TabAView: View {
                 Spacer()
                 TextField("エピソードの説明を入力", text: $description)
             }
+            Toggle(isOn: $enableConvert) {
+                Text("変換処理を有効にする")
+            }.padding()
             Button(action: {
                 self.ConvertAndUpload()
             }) {

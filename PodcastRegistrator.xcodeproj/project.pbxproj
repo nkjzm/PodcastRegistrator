@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		246EE76427CD861800A1F5E4 /* TabCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246EE76327CD861800A1F5E4 /* TabCView.swift */; };
+		2476C9E827D339AA00066001 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2476C9E727D339AA00066001 /* Utils.swift */; };
 		2491B8E625E9C9BA00916202 /* TabAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E525E9C9BA00916202 /* TabAView.swift */; };
 		2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E825E9C9DC00916202 /* TabBView.swift */; };
 		24F4D345238D74C500970A73 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F4D344238D74C500970A73 /* AppDelegate.swift */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		246EE76327CD861800A1F5E4 /* TabCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCView.swift; sourceTree = "<group>"; };
+		2476C9E727D339AA00066001 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		2491B8E525E9C9BA00916202 /* TabAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabAView.swift; sourceTree = "<group>"; };
 		2491B8E825E9C9DC00916202 /* TabBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBView.swift; sourceTree = "<group>"; };
 		24F4D341238D74C500970A73 /* PodcastRegistrator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PodcastRegistrator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +73,7 @@
 				2491B8E525E9C9BA00916202 /* TabAView.swift */,
 				2491B8E825E9C9DC00916202 /* TabBView.swift */,
 				246EE76327CD861800A1F5E4 /* TabCView.swift */,
+				2476C9E727D339AA00066001 /* Utils.swift */,
 			);
 			path = PodcastRegistrator;
 			sourceTree = "<group>";
@@ -159,6 +162,7 @@
 				2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */,
 				24F4D345238D74C500970A73 /* AppDelegate.swift in Sources */,
 				2491B8E625E9C9BA00916202 /* TabAView.swift in Sources */,
+				2476C9E827D339AA00066001 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

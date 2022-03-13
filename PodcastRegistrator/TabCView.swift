@@ -34,7 +34,8 @@ struct TabCView: View {
         if(self.enableMultipleConvert){
             convertMultiple()
         }else{
-            convert(number: self.number, rate: 100)
+            let episodeNumber = Int(number)!
+            convert(episodeNumber: episodeNumber, rate: 100)
         }
         
         callback()
@@ -52,18 +53,19 @@ struct TabCView: View {
                 continue
             }
             
-            let number = file.replacingOccurrences(of: ".mp3", with: "")
-            
-            convert(number: number, rate: rate)
+            let number = file.replacingOccurrences(of: "xrfm_", with: "").replacingOccurrences(of: ".mp3", with: "")
+            let episodeNumber = Int(number)!
+
+            convert(episodeNumber: episodeNumber, rate: rate)
         }
     }
     
-    func convert(number: String, rate: Float)
+    func convert(episodeNumber: Int, rate: Float)
     {
-        let original = "\(self.audioRootPath)/\(TabBView.GetAudioName(number: number))"
-        let outputFilePath = "\(self.movieRootPath)/\(TabBView.GetMovieName(number: number))"
+        let original = "\(self.audioRootPath)/\(GetAudioName(episodeNumber: episodeNumber))"
+        let outputFilePath = "\(self.movieRootPath)/\(GetMovieName(episodeNumber: episodeNumber))"
         
-        progress = "変換開始: " + number
+        progress = "変換開始: " + String(episodeNumber)
         
         self.ConvertToMp4(path: original, outputFilePath: outputFilePath) {
             progress = "変換完了: " + number
@@ -108,15 +110,6 @@ struct TabCView: View {
         task.launch()
     }
     
-    static func GetAudioName(number : String) -> String {
-        let episodeNumber = Int(number)!
-        return "xrfm_\(String(format: "%03d", episodeNumber)).mp3"
-    }
-    
-    static func GetRawAudioName(number : String) -> String {
-        let episodeNumber = Int(number)!
-        return "xrfm_\(String(format: "%03d", episodeNumber))_raw.mp3"
-    }
     
     var body: some View {
         

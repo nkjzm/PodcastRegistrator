@@ -20,7 +20,7 @@ struct TabBView: View {
     
     let gitRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io"
     let audioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
-    let rawAudioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/audio/raw"
+    let rawAudioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/raw-audio"
     let mdRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
     let artworkPath : String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     
@@ -45,11 +45,12 @@ struct TabBView: View {
                 }
                 
                 let number = file.replacingOccurrences(of: ".wav", with: "")
-                
+                let episodeNumber = Int(number)!
+
                 
                 let original = "\(self.rawAudioRootPath)/wav/\(number).wav"
                 
-                let outputFilePath = "\(self.rawAudioRootPath)/\(TabBView.GetRawAudioName(number: number))"
+                let outputFilePath = "\(self.rawAudioRootPath)/\(GetRawAudioName(episodeNumber: episodeNumber))"
                 
                 progress = "変換開始: " + number
                 
@@ -99,20 +100,7 @@ struct TabBView: View {
         task.launch()
     }
     
-    static func GetAudioName(number : String) -> String {
-        let episodeNumber = Int(number)!
-        return "xrfm_\(String(format: "%03d", episodeNumber)).mp3"
-    }
-    
-    static func GetRawAudioName(number : String) -> String {
-        let episodeNumber = Int(number)!
-        return "xrfm_\(String(format: "%03d", episodeNumber))_raw.mp3"
-    }
-    
-    static func GetMovieName(number : String) -> String {
-        let episodeNumber = Int(number)!
-        return "xrfm_\(String(format: "%03d", episodeNumber)).mp4"
-    }
+ 
     
     var body: some View {
         
