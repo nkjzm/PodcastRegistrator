@@ -8,28 +8,31 @@ struct ContentView: View {
             TabAView()
                 .tabItem {
                     VStack {
-//                        Image(systemName: "a")
                         Text("アップローダー")
                     }
             }.tag(1)
             TabBView()
                 .tabItem {
                     VStack {
-//                        Image(systemName: "bold")
                         Text("コンバーター")
                         
                     }
-            }.tag(2).frame(width: 500)
+            }.tag(2)
             TabCView()
                 .tabItem {
                     VStack {
-//                        Image(systemName: "bold")
                         Text("動画に変換")
                         
                     }
-            }.tag(3).frame(width: 500)
-
-        }
+            }.tag(3)
+            Tab_AddUser()
+                .tabItem {
+                    VStack {
+                        Text("ユーザー登録")
+                        
+                    }
+            }.tag(4)
+        }.frame(width: 500)
     }
     
     struct ContentView_Previews: PreviewProvider {

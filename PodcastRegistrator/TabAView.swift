@@ -88,17 +88,6 @@ struct TabAView: View {
         task.launch()
     }
     
-    func SaveFile(filename : String, message : String, callback: @escaping () -> Void) -> Void {
-        // 保存する場所
-        let filePath = "\(mdRootPath)/\(filename)"
-        
-        // 保存処理
-        do {
-            try message.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
-            callback();
-        } catch { }
-    }
-    
     // オーディオファイルを開く
     static func OpenAudio() -> String {
         let openPanel = NSOpenPanel()
@@ -218,7 +207,10 @@ struct TabAView: View {
         
         // mdファイルに書き込み
         let mdFilename = getMdFilename()
-        self.SaveFile(filename: mdFilename, message: message, callback: {
+        // 保存する場所
+        let filePath = "\(mdRootPath)/\(mdFilename)"
+        
+        SaveFile(filePath: filePath, message: message, callback: {
             
             self.progress = "アップロード中"
             

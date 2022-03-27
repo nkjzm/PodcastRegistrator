@@ -19,3 +19,12 @@ func GetRawAudioName(episodeNumber : Int) -> String {
 func GetMovieName(episodeNumber : Int) -> String {
     return "xrfm_\(String(format: "%03d", episodeNumber)).mp4"
 }
+
+func SaveFile(filePath : String, message : String, callback: @escaping () -> Void) -> Void {
+    // 保存処理
+    do {
+        try message.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
+        callback();
+    } catch { }
+}
+
