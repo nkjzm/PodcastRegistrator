@@ -1,78 +1,69 @@
-//
-//  TabCView.swift
-//  PodcastRegistrator
-//
-//  Created by Nakaji Kohki on 2022/03/01.
-//  Copyright © 2022 Nakaji Kohki. All rights reserved.
-//
-
 import Foundation
 import SwiftUI
 
-
 struct TabCView: View {
-    
-    @State private var number : String  = ""
-    @State private var progress : String = "処理開始前"
+
+    @State private var number: String = ""
+    @State private var progress: String = "処理開始前"
     // 一括変換
     @State private var enableMultipleConvert = false
-    @State private var valueAmount : Float = -1;
-    
-    let gitRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io"
-    let audioRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
-    let movieRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/movie"
-    let mdRootPath : String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
-    let artworkPath : String = "/Users/nkjzm/Dropbox/xrpodcast.png"
-    let thubnailPath : String = "/Users/nkjzm/Projects/xrfm.github.io/images/thumbnail.png"
-    
+    @State private var valueAmount: Float = -1;
+
+    let gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io"
+    let audioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
+    let movieRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/movie"
+    let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
+    let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
+    let thubnailPath: String = "/Users/nkjzm/Projects/xrfm.github.io/images/thumbnail.png"
+
     func Convert(callback: @escaping () -> Void) -> Void {
-        
+
         progress = "変換処理開始"
         self.valueAmount = 0.1
-        
-        
-        if(self.enableMultipleConvert){
+
+
+        if(self.enableMultipleConvert) {
             convertMultiple()
-        }else{
+        } else {
             let episodeNumber = Int(number)!
             convert(episodeNumber: episodeNumber, rate: 100)
         }
-        
+
         callback()
     }
-    
+
     func convertMultiple()
     {
         let files = getFileInfoListInDir(self.audioRootPath)
-        let rate : Float = 100.0 / Float(files.count)
-        
-        for (_,file) in files.enumerated() {
-            
+        let rate: Float = 100.0 / Float(files.count)
+
+        for (_, file) in files.enumerated() {
+
             if(file == ".DS_Store" || file == "raw")
             {
                 continue
             }
-            
+
             let number = file.replacingOccurrences(of: "xrfm_", with: "").replacingOccurrences(of: ".mp3", with: "")
             let episodeNumber = Int(number)!
 
             convert(episodeNumber: episodeNumber, rate: rate)
         }
     }
-    
+
     func convert(episodeNumber: Int, rate: Float)
     {
         let original = "\(self.audioRootPath)/\(GetAudioName(episodeNumber: episodeNumber))"
         let outputFilePath = "\(self.movieRootPath)/\(GetMovieName(episodeNumber: episodeNumber))"
-        
+
         progress = "変換開始: " + String(episodeNumber)
-        
+
         self.ConvertToMp4(path: original, outputFilePath: outputFilePath) {
             progress = "変換完了: " + number
             self.valueAmount += rate
         }
     }
-    
+
     func getFileInfoListInDir(_ dirName: String) -> [String] {
         let fileManager = FileManager.default
         var files: [String] = []
@@ -83,13 +74,13 @@ struct TabCView: View {
         }
         return files
     }
-    
+
     // wavファイルを変換してアートワークを設定する
-    func ConvertToMp4(path : String, outputFilePath : String, callback: @escaping () -> Void) -> Void {
-        
+    func ConvertToMp4(path: String, outputFilePath: String, callback: @escaping () -> Void) -> Void {
+
         let task = Process()
         task.launchPath = "/bin/sh"
-        
+
         let convertArg = """
         /usr/local/bin/ffmpeg \
             -t `/usr/local/bin/ffprobe -v error -i \(path) -show_format | grep duration= | cut -d '=' -f 2` \
@@ -102,29 +93,29 @@ struct TabCView: View {
             -shortest \
             \(outputFilePath);
         """
-        
-        task.arguments = ["-c",convertArg]
-        task.terminationHandler = { _ in callback()}
-        
+
+        task.arguments = ["-c", convertArg]
+        task.terminationHandler = { _ in callback() }
+
         // コマンド実行
         task.launch()
     }
-    
-    
+
+
     var body: some View {
-        
+
         VStack {
             Toggle(isOn: $enableMultipleConvert) {
                 Text("一括変換する")
             }.padding()
             if !self.enableMultipleConvert
             {
-                HStack(alignment: .center){
+                HStack(alignment: .center) {
                     Text("回数").frame(width: 100)
                     TextField("0", text: $number)
                 }
             }
-            
+
             Button(action: {
                 self.Convert(callback: {
                     progress = "変換処理完了"
@@ -136,9 +127,9 @@ struct TabCView: View {
             if self.valueAmount > 0
             {
                 if #available(OSX 11.0, *) {
-                    ProgressView(self.progress, value : self.valueAmount, total : 100)
+                    ProgressView(self.progress, value: self.valueAmount, total: 100)
                 } else {
-                    HStack(alignment: .center){
+                    HStack(alignment: .center) {
                         Text("進捗状況").frame(width: 100)
                         Text(verbatim: progress)
                         Spacer()

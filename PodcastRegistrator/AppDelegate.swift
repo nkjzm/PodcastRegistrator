@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  PodcastRegistrator
-//
-//  Created by 中地功貴 on 2019/11/26.
-//  Copyright © 2019 Nakaji Kohki. All rights reserved.
-//
-
 import Cocoa
 import SwiftUI
 
@@ -19,7 +11,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Create the SwiftUI view that provides the window contents.
         let contentView = ContentView()
 
-        // Create the window and set the content view. 
+        // Create the window and set the content view.
         window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
