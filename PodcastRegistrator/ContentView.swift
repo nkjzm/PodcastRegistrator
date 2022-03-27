@@ -3,8 +3,10 @@ import AVFoundation
 
 struct ContentView: View {
 
+    @AppStorage("selection") private var selection = 0
+
     var body: some View {
-        TabView {
+        TabView(selection: $selection) {
             TabAView().tabItem { VStack { Text("アップローダー") } }.tag(1)
             TabBView().tabItem { VStack { Text("コンバーター") } }.tag(2)
             TabCView().tabItem { VStack { Text("動画に変換") } }.tag(3)

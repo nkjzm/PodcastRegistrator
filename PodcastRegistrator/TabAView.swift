@@ -5,10 +5,10 @@ import AVFoundation
 struct TabAView: View {
 
     @State private var enableConvert: Bool = true
-    @State private var episodeNumber: Int = 0
+    @AppStorage("episodeNumber") private var episodeNumber: Int = 0
     @State private var audioPath: String = "未選択"
-    @State private var title: String = ""
-    @State private var description: String = ""
+    @AppStorage("title") private var title: String = ""
+    @AppStorage("description") private var description: String = ""
     @State private var progress: String = "処理開始前"
     @State var date = Date()
 
