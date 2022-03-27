@@ -16,6 +16,16 @@ func GetMovieName(episodeNumber: Int) -> String {
     return "xrfm_\(String(format: "%03d", episodeNumber)).mp4"
 }
 
+/// ファイルを読み込む
+func LoadTextFile(filePath: String) -> String {
+    let fileURL = URL(fileURLWithPath: filePath)
+    // 保存処理
+    do {
+        return try String(contentsOf: fileURL, encoding: .utf8)
+    } catch { }
+    return ""
+}
+
 /// ファイルを保存する
 func SaveTextFile(filePath: String, message: String, callback: @escaping () -> Void) -> Void {
     // 保存処理

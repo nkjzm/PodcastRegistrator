@@ -8,15 +8,32 @@ struct Tab_AddUser: View {
     @State private var showingAlert = false
 
     let imageRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/images/actors/"
+    let configPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_config.yml"
 
     func Convert() -> Void {
 
         // 拡張子を取得
         let path = NSString(string: imagePath)
         let pathExtension = "." + path.pathExtension
-
+        
+        let imageName = userId + pathExtension
         // アイコンを保存
-        SameImage(sourcePath: imagePath, outputPath: imageRootPath + userId + pathExtension)
+        SameImage(sourcePath: imagePath, outputPath: imageRootPath + imageName)
+
+        print(LoadTextFile(filePath: configPath))
+        var configText = LoadTextFile(filePath: configPath)
+
+        let actor = """
+              \(userId):
+                image_url: /images/actors/\(imageName)
+                name: \(userId)
+                url: https://twitter.com/\(userId)
+            author: nkjzm
+            """
+
+        configText = configText.replacingOccurrences(of: "author: nkjzm", with: actor)
+
+        SaveTextFile(filePath: configPath, message: configText, callback: { })
 
         showingAlert = true
     }
