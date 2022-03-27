@@ -7,8 +7,31 @@ struct Tab_AddUser: View {
     @State private var imagePath: String = "未選択"
     @State private var showingAlert = false
 
+    let imageRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/images/actors/"
+
     func Convert() -> Void {
+
+        // 拡張子を取得
+        let path = NSString(string: imagePath)
+        let pathExtension = "." + path.pathExtension
+
+        // アイコンを保存
+        SameImage(sourcePath: imagePath, outputPath: imageRootPath + userId + pathExtension)
+
         showingAlert = true
+    }
+
+    // Gitリポジトリにアップロード
+    func SameImage(sourcePath: String, outputPath: String) -> Void {
+        print(sourcePath)
+        print(outputPath)
+        let task = Process()
+        // 起動するプログラムを絶対パスで指定
+        task.launchPath = "/bin/sh"
+        // オプションを指定
+        task.arguments = ["-c", "mv \(sourcePath) \(outputPath);"]
+        // コマンド実行
+        task.launch()
     }
 
     var body: some View {
@@ -23,7 +46,7 @@ struct Tab_AddUser: View {
                     .frame(width: 100)
                 Text("\(self.imagePath)").frame(maxWidth: .infinity)
                 Button(action: {
-                    self.imagePath = TabAView.OpenAudio()
+                    self.imagePath = OpenImage()
                 }) {
                     Text("アイコン画像を開く")
                 }

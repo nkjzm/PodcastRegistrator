@@ -202,7 +202,7 @@ struct TabAView: View {
         // 保存する場所
         let filePath = "\(mdRootPath)/\(mdFilename)"
 
-        SaveFile(filePath: filePath, message: message, callback: {
+        SaveTextFile(filePath: filePath, message: message, callback: {
 
             self.progress = "アップロード中"
 

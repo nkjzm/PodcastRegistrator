@@ -8,7 +8,7 @@ struct ContentView: View {
             TabAView().tabItem { VStack { Text("アップローダー") } }.tag(1)
             TabBView().tabItem { VStack { Text("コンバーター") } }.tag(2)
             TabCView().tabItem { VStack { Text("動画に変換") } }.tag(3)
-            TabCView().tabItem { VStack { Text("ユーザー登録") } }.tag(4)
+            Tab_AddUser().tabItem { VStack { Text("ユーザー登録") } }.tag(4)
         }.frame(width: 500)
     }
 
