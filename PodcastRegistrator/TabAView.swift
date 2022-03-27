@@ -9,6 +9,14 @@ struct TabAView: View {
     @State private var audioPath: String = "未選択"
     @AppStorage("title") private var title: String = ""
     @AppStorage("description") private var description: String = ""
+    @State private var array: [String] = [
+        "ikkou",
+        "nkjzm",
+        "",
+        "",
+        "",
+    ]
+
     @State private var progress: String = "処理開始前"
     @State var date = Date()
 
@@ -174,12 +182,19 @@ struct TabAView: View {
         formatter.allowedUnits = [.minute, .hour, .second]
         let outputString = formatter.string(from: duration)!
 
+        var actors = ""
+
+        for i in 0..<array.count {
+            let name = array[i]
+            if name != "" {
+                actors += "\n- \(name)"
+            }
+        }
+
         let dateStr = getDateStr()
         let message = """
             ---
-            actor_ids:
-            - ikkou
-            - nkjzm
+            actor_ids: \(actors)
             audio_file_path: /audio/\(audioFilename)
             audio_file_size: \(size) MB
             date: \(dateStr) 00:00:00 +0900
@@ -219,8 +234,7 @@ struct TabAView: View {
             Text("エピソードの情報を入力してください")
                 .frame(maxWidth: .infinity)
             HStack(alignment: .center) {
-                Text("ファイル")
-                    .frame(width: 100)
+                Text("ファイル") .frame(width: 100)
                 Text("\(self.audioPath)").frame(maxWidth: .infinity)
                 Button(action: {
                     self.audioPath = TabAView.OpenAudio()
@@ -229,28 +243,33 @@ struct TabAView: View {
                 }
             }
             HStack(alignment: .center) {
-                Text("回数")
-                    .frame(width: 100)
+                Text("回数") .frame(width: 100)
                 TextField("0", value: $episodeNumber, formatter: NumberFormatter())
             }
             DatePicker(selection: $date,
                 in: ...Date(), displayedComponents: .date
             ) {
-                Text("収録日")
-                    .frame(width: 100)
+                Text("収録日") .frame(width: 100)
             }
             HStack(alignment: .center) {
-                Text("タイトル")
-                    .frame(width: 100)
+                Text("タイトル") .frame(width: 100)
                 Spacer()
                 TextField("エピソードのタイトルを入力", text: $title)
             }
             HStack(alignment: .center) {
-                Text("内容")
-                    .frame(width: 100)
+                Text("内容") .frame(width: 100)
                 Spacer()
                 TextField("エピソードの説明を入力", text: $description)
             }
+            VStack (spacing: 0) {
+                ForEach(0..<array.count) { num in
+                    HStack(alignment: .center) {
+                        Text("ゲスト: \(num + 1)") .frame(width: 100)
+                        Spacer()
+                        TextField("nkjzm", text: $array[num])
+                    }
+                }
+            }.padding(.leading)
             Toggle(isOn: $enableConvert) {
                 Text("変換処理を有効にする")
             }.padding()

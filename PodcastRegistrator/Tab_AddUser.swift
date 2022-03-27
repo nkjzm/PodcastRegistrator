@@ -3,7 +3,7 @@ import SwiftUI
 
 struct Tab_AddUser: View {
 
-    @State private var userId: String = ""
+    @AppStorage("guestUserId") private var userId: String = ""
     @State private var imagePath: String = "未選択"
     @State private var showingAlert = false
 
