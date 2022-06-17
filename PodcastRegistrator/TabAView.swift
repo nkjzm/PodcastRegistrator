@@ -3,12 +3,18 @@ import SwiftUI
 import AVFoundation
 
 struct TabAView: View {
-
+    
     @State private var enableConvert: Bool = true
     @AppStorage("episodeNumber") private var episodeNumber: Int = 0
     @State private var audioPath: String = "未選択"
     @AppStorage("title") private var title: String = ""
     @AppStorage("description") private var description: String = ""
+    @State private var content: String = """
+    ## 関連リンク
+    
+    - 公式Twitter: [@xRfrn](https://twitter.com/xrfrn)
+    - ハッシュタグ: [#xRfm](https://twitter.com/hashtag/xRfm?src=hash)
+    """
     @State private var array: [String] = [
         "ikkou",
         "nkjzm",
@@ -16,26 +22,26 @@ struct TabAView: View {
         "",
         "",
     ]
-
+    
     @State private var progress: String = "処理開始前"
     @State var date = Date()
-
+    
     let gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs"
     let audioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/audio"
     let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_posts"
     let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
-
+    
     // wavファイルを変換してアートワークを設定する
     func ConvertToMp3(path: String, filename: String, callback: @escaping () -> Void) -> Void {
-
+        
         let noiseProf: String = "\"\(gitRootPath)/noise.prof\""
         let noiseRemoved: String = "\"\(gitRootPath)/noise_removed.wav\""
         let silenceRemoved: String = "\"\(gitRootPath)/silence_removed.wav\""
         let formatConverted: String = "\"\(gitRootPath)/format_converted.mp3\""
-
+        
         let task = Process()
         task.launchPath = "/bin/sh"
-
+        
         let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof \(noiseProf);"
         let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
         //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
@@ -48,7 +54,7 @@ struct TabAView: View {
         // コマンド実行
         task.launch()
     }
-
+    
     // ファイルを作成
     func Touch(filename: String) -> Void {
         let task = Process()
@@ -59,7 +65,7 @@ struct TabAView: View {
         // コマンド実行
         task.launch()
     }
-
+    
     // ファイルサイズを取得
     func GetFileSize(filename: String, callback: @escaping (String) -> Void) -> Void {
         let task = Process()
@@ -68,16 +74,16 @@ struct TabAView: View {
         // オプションを指定
         task.arguments = ["-c", "\(audioRootPath)/\(filename)"]
         print(task.arguments)
-
+        
         let pipe = Pipe()
         task.standardOutput = pipe
-
+        
         task.terminationHandler = {
             (process: Process) -> Void in
-
+            
             let readHandle = pipe.fileHandleForReading
             let data = readHandle.readDataToEndOfFile()
-
+            
             if let output = String(data: data, encoding: .utf8)
             {
                 let arr: [String] = output.components(separatedBy: " ")
@@ -87,7 +93,7 @@ struct TabAView: View {
         // コマンド実行
         task.launch()
     }
-
+    
     // オーディオファイルを開く
     static func OpenAudio() -> String {
         let openPanel = NSOpenPanel()
@@ -96,11 +102,11 @@ struct TabAView: View {
         openPanel.canCreateDirectories = false //ディレクトリの作成
         openPanel.canChooseFiles = true //ファイルの選択
         openPanel.allowedFileTypes = ["wav", "mp3"] //ファイルの種類
-
+        
         let reault = openPanel.runModal()
         if(reault == NSApplication.ModalResponse.OK) {
             if let panelURL = openPanel.url {
-
+                
                 let path: String = panelURL.path
                 print(path)
                 return path
@@ -108,7 +114,7 @@ struct TabAView: View {
         }
         return ""
     }
-
+    
     // Gitリポジトリにアップロード
     func Upload(audioFilename: String, mdFilename: String, count: Int, callback: @escaping () -> Void) -> Void {
         let task = Process()
@@ -122,13 +128,13 @@ struct TabAView: View {
         // コマンド実行
         task.launch()
     }
-
+    
     // 音声ファイルを変換してGitリポジトリにアップロード
     func ConvertAndUpload() -> Void {
         let audioFilename = GetAudioName(episodeNumber: episodeNumber)
-
+        
         self.progress = "音声ファイルを変換しています"
-
+        
         if(enableConvert) {
             // 音声ファイルの変換
             self.ConvertToMp3(path: self.audioPath, filename: audioFilename, callback: { self.MakeMarkdown() })
@@ -136,61 +142,61 @@ struct TabAView: View {
             self.MakeMarkdown()
         }
     }
-
+    
     func getDateStr() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd" // 日付フォーマットの設定
         return dateFormatter.string(from: self.date)
     }
-
+    
     func getMdFilename() -> String {
         let dateStr = getDateStr()
         return "\(dateStr)-\(episodeNumber).md"
     }
-
+    
     func MakeMarkdown() {
         // mdファイルの名前を取得
         let mdFilename = getMdFilename()
-
+        
         // mdファイルを作成
         self.Touch(filename: mdFilename)
-
+        
         self.progress = "mdファイルを生成しています"
-
+        
         print("GetFileSize前")
-
+        
         // 音声ファイルのサイズ取得
         let audioFilename = GetAudioName(episodeNumber: episodeNumber)
         self.GetFileSize(filename: audioFilename, callback: { out in
             self.SetMarkdown(sizeStr: out)
         })
     }
-
+    
     func SetMarkdown(sizeStr: String)
     {
         // サイズをMB表記に変換
         let size = String(format: "%.01f", Float(sizeStr)! / 1000000)
-
+        
         // 音声の長さを取得
         let audioFilename = GetAudioName(episodeNumber: episodeNumber)
         let asset = AVURLAsset(url: URL(fileURLWithPath: "\(self.audioRootPath)/\(audioFilename)"))
         let duration = Double(CMTimeGetSeconds(asset.duration))
-
+        
         // 秒数を時間に整形
         let formatter = DateComponentsFormatter()
         formatter.unitsStyle = .positional
         formatter.allowedUnits = [.minute, .hour, .second]
         let outputString = formatter.string(from: duration)!
-
+        
         var actors = ""
-
+        
         for i in 0..<array.count {
             let name = array[i]
             if name != "" {
                 actors += "\n- \(name)"
             }
         }
-
+        
         let dateStr = getDateStr()
         let message = """
             ---
@@ -204,62 +210,66 @@ struct TabAView: View {
             title: 第\(episodeNumber)回「\(self.title)」
             ---
             
-            ## 関連リンク
-            
-            - 公式Twitter: [@xRfrn](https://twitter.com/xrfrn)
-            - ハッシュタグ: [#xRfm](https://twitter.com/hashtag/xRfm?src=hash)
+            \(self.content)
             """
-
+        
         self.progress = "mdファイルを書き込んでいます"
-
+        
         // mdファイルに書き込み
         let mdFilename = getMdFilename()
         // 保存する場所
         let filePath = "\(mdRootPath)/\(mdFilename)"
-
+        
         SaveTextFile(filePath: filePath, message: message, callback: {
-
+            
             self.progress = "アップロード中"
-
+            
             // Gitリポジトリにアップロード
             self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
                 self.progress = "アップロード完了!"
             })
         })
     }
-
-
+    
+    
     var body: some View {
         VStack {
-            Text("エピソードの情報を入力してください")
-                .frame(maxWidth: .infinity)
-            HStack(alignment: .center) {
-                Text("ファイル") .frame(width: 100)
-                Text("\(self.audioPath)").frame(maxWidth: .infinity)
-                Button(action: {
-                    self.audioPath = TabAView.OpenAudio()
-                }) {
-                    Text("オーディオファイルを開く")
+            VStack (spacing: 5) {
+                Text("エピソードの情報を入力してください")
+                    .frame(maxWidth: .infinity)
+                HStack(alignment: .center) {
+                    Text("ファイル") .frame(width: 100)
+                    Text("\(self.audioPath)").frame(maxWidth: .infinity)
+                    Button(action: {
+                        self.audioPath = TabAView.OpenAudio()
+                    }) {
+                        Text("オーディオファイルを開く")
+                    }
                 }
-            }
-            HStack(alignment: .center) {
-                Text("回数") .frame(width: 100)
-                TextField("0", value: $episodeNumber, formatter: NumberFormatter())
-            }
-            DatePicker(selection: $date,
-                in: ...Date(), displayedComponents: .date
-            ) {
-                Text("収録日") .frame(width: 100)
-            }
-            HStack(alignment: .center) {
-                Text("タイトル") .frame(width: 100)
-                Spacer()
-                TextField("エピソードのタイトルを入力", text: $title)
-            }
-            HStack(alignment: .center) {
-                Text("内容") .frame(width: 100)
-                Spacer()
-                TextField("エピソードの説明を入力", text: $description)
+                HStack(alignment: .center) {
+                    Text("回数") .frame(width: 100)
+                    TextField("0", value: $episodeNumber, formatter: NumberFormatter())
+                }
+                DatePicker(selection: $date,
+                           in: ...Date(), displayedComponents: .date
+                ) {
+                    Text("収録日") .frame(width: 100)
+                }
+                HStack(alignment: .center) {
+                    Text("タイトル") .frame(width: 100)
+                    Spacer()
+                    TextField("エピソードのタイトルを入力", text: $title)
+                }
+                HStack(alignment: .center) {
+                    Text("内容") .frame(width: 100)
+                    Spacer()
+                    TextField("エピソードの説明を入力", text: $description)
+                }
+                HStack(alignment: .center) {
+                    Text("関連リンク").frame(width: 100, height: 100)
+                    Spacer()
+                    TextEditor(text: $content)
+                }
             }
             VStack (spacing: 0) {
                 ForEach(0..<array.count) { num in
