@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct Tab_AddUser: View {
+struct AddUserView: View {
 
     @AppStorage("guestUserId") private var userId: String = ""
     @State private var imagePath: String = "未選択"
@@ -84,6 +84,6 @@ struct Tab_AddUser: View {
 
 struct Tab_AddUser_Previews: PreviewProvider {
     static var previews: some View {
-        Tab_AddUser()
+        AddUserView()
     }
 }

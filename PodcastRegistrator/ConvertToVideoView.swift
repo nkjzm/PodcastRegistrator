@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct TabCView: View {
+struct ConvertToVideoView: View {
 
     @State private var number: String = ""
     @State private var progress: String = "処理開始前"
@@ -142,6 +142,6 @@ struct TabCView: View {
 
 struct TabCView_Previews: PreviewProvider {
     static var previews: some View {
-        TabCView()
+        ConvertToVideoView()
     }
 }

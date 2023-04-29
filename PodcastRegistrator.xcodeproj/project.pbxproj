@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		246EE76427CD861800A1F5E4 /* TabCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246EE76327CD861800A1F5E4 /* TabCView.swift */; };
+		246EE76427CD861800A1F5E4 /* ConvertToVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 246EE76327CD861800A1F5E4 /* ConvertToVideoView.swift */; };
 		2476C9E827D339AA00066001 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2476C9E727D339AA00066001 /* Utils.swift */; };
-		2491B8E625E9C9BA00916202 /* TabAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E525E9C9BA00916202 /* TabAView.swift */; };
-		2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E825E9C9DC00916202 /* TabBView.swift */; };
-		24A9098527EFFD72002E6E9B /* Tab_AddUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */; };
+		2491B8E625E9C9BA00916202 /* UploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E525E9C9BA00916202 /* UploadView.swift */; };
+		2491B8E925E9C9DC00916202 /* ConvertAudioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E825E9C9DC00916202 /* ConvertAudioView.swift */; };
+		24A9098527EFFD72002E6E9B /* AddUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A9098427EFFD72002E6E9B /* AddUserView.swift */; };
 		24DAAE3E29FCD29300208869 /* PodcastRegistratorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */; };
 		24DAAE4029FCD54800208869 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE3F29FCD54800208869 /* SettingsView.swift */; };
 		24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */; };
@@ -23,11 +23,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		246EE76327CD861800A1F5E4 /* TabCView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabCView.swift; sourceTree = "<group>"; };
+		246EE76327CD861800A1F5E4 /* ConvertToVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertToVideoView.swift; sourceTree = "<group>"; };
 		2476C9E727D339AA00066001 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		2491B8E525E9C9BA00916202 /* TabAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabAView.swift; sourceTree = "<group>"; };
-		2491B8E825E9C9DC00916202 /* TabBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBView.swift; sourceTree = "<group>"; };
-		24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab_AddUser.swift; sourceTree = "<group>"; };
+		2491B8E525E9C9BA00916202 /* UploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadView.swift; sourceTree = "<group>"; };
+		2491B8E825E9C9DC00916202 /* ConvertAudioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertAudioView.swift; sourceTree = "<group>"; };
+		24A9098427EFFD72002E6E9B /* AddUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUserView.swift; sourceTree = "<group>"; };
 		24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastRegistratorApp.swift; sourceTree = "<group>"; };
 		24DAAE3F29FCD54800208869 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
@@ -77,11 +77,11 @@
 				24F4D350238D74C800970A73 /* Info.plist */,
 				24F4D351238D74C800970A73 /* PodcastRegistrator.entitlements */,
 				24F4D34A238D74C800970A73 /* Preview Content */,
-				2491B8E525E9C9BA00916202 /* TabAView.swift */,
-				2491B8E825E9C9DC00916202 /* TabBView.swift */,
-				246EE76327CD861800A1F5E4 /* TabCView.swift */,
+				2491B8E525E9C9BA00916202 /* UploadView.swift */,
+				2491B8E825E9C9DC00916202 /* ConvertAudioView.swift */,
+				246EE76327CD861800A1F5E4 /* ConvertToVideoView.swift */,
 				2476C9E727D339AA00066001 /* Utils.swift */,
-				24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */,
+				24A9098427EFFD72002E6E9B /* AddUserView.swift */,
 				24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */,
 				24DAAE3F29FCD54800208869 /* SettingsView.swift */,
 				24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */,
@@ -169,16 +169,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				246EE76427CD861800A1F5E4 /* TabCView.swift in Sources */,
+				246EE76427CD861800A1F5E4 /* ConvertToVideoView.swift in Sources */,
 				24DAAE4029FCD54800208869 /* SettingsView.swift in Sources */,
 				24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */,
 				24DAAE4429FCD59300208869 /* AdvancedSettingsView.swift in Sources */,
 				24F4D347238D74C500970A73 /* ContentView.swift in Sources */,
-				2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */,
+				2491B8E925E9C9DC00916202 /* ConvertAudioView.swift in Sources */,
 				24DAAE3E29FCD29300208869 /* PodcastRegistratorApp.swift in Sources */,
-				2491B8E625E9C9BA00916202 /* TabAView.swift in Sources */,
+				2491B8E625E9C9BA00916202 /* UploadView.swift in Sources */,
 				2476C9E827D339AA00066001 /* Utils.swift in Sources */,
-				24A9098527EFFD72002E6E9B /* Tab_AddUser.swift in Sources */,
+				24A9098527EFFD72002E6E9B /* AddUserView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

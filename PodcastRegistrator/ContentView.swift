@@ -7,10 +7,10 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            TabAView().tabItem { VStack { Text("アップローダー") } }.tag(1)
-            TabBView().tabItem { VStack { Text("コンバーター") } }.tag(2)
-            TabCView().tabItem { VStack { Text("動画に変換") } }.tag(3)
-            Tab_AddUser().tabItem { VStack { Text("ユーザー登録") } }.tag(4)
+            UploadView().tabItem { VStack { Text("アップローダー") } }.tag(1)
+            ConvertAudioView().tabItem { VStack { Text("コンバーター") } }.tag(2)
+            ConvertToVideoView().tabItem { VStack { Text("動画に変換") } }.tag(3)
+            AddUserView().tabItem { VStack { Text("ユーザー登録") } }.tag(4)
         }.frame(width: 500)
     }
     

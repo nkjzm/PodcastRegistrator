@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct TabBView: View {
+struct ConvertAudioView: View {
 
     // @State private var number : String  = ""
     @State private var audioPath: String = "未選択"
@@ -150,6 +150,6 @@ struct TabBView: View {
 
 struct TabBView_Previews: PreviewProvider {
     static var previews: some View {
-        TabBView()
+        ConvertAudioView()
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import AVFoundation
 
-struct TabAView: View {
+struct UploadView: View {
     
     @State private var enableConvert: Bool = true
     @AppStorage("episodeNumber") private var episodeNumber: Int = 0
@@ -47,7 +47,7 @@ struct TabAView: View {
                 
                 // Gitリポジトリにアップロード
                 self.progress = "アップロード中"
-                try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
+                // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
                 
                 self.progress = "アップロード完了!"
                 
@@ -278,6 +278,6 @@ struct TabAView: View {
 
 struct TabAView_Previews: PreviewProvider {
     static var previews: some View {
-        TabAView()
+        UploadView()
     }
 }
