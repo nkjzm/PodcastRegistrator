@@ -2,9 +2,9 @@ import SwiftUI
 import AVFoundation
 
 struct ContentView: View {
-
+    
     @AppStorage("selection") private var selection = 0
-
+    
     var body: some View {
         TabView(selection: $selection) {
             TabAView().tabItem { VStack { Text("アップローダー") } }.tag(1)
@@ -13,7 +13,7 @@ struct ContentView: View {
             Tab_AddUser().tabItem { VStack { Text("ユーザー登録") } }.tag(4)
         }.frame(width: 500)
     }
-
+    
     struct ContentView_Previews: PreviewProvider {
         static var previews: some View {
             ContentView()
