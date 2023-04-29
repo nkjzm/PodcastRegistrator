@@ -66,32 +66,28 @@ struct TabAView: View {
         task.launch()
     }
     
-    // ファイルサイズを取得
-    func GetFileSize(filename: String, callback: @escaping (String) -> Void) -> Void {
-        let task = Process()
-        // 起動するプログラムを絶対パスで指定
-        task.launchPath = "/usr/bin/wc"
-        // オプションを指定
-        task.arguments = ["-c", "\(audioRootPath)/\(filename)"]
-        print(task.arguments)
-        
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        
-        task.terminationHandler = {
-            (process: Process) -> Void in
+    func getFileSize(filename: String) async throws -> String {
+        return try await withCheckedThrowingContinuation { continuation in
+            let task = Process()
             
-            let readHandle = pipe.fileHandleForReading
-            let data = readHandle.readDataToEndOfFile()
+            // 起動するプログラムを絶対パスで指定
+            task.launchPath = "/usr/bin/wc"
+            // オプションを指定
+            task.arguments = ["-c", "\(audioRootPath)/\(filename)"]
             
-            if let output = String(data: data, encoding: .utf8)
-            {
-                let arr: [String] = output.components(separatedBy: " ")
-                callback(arr[1])
+            let outputPipe = Pipe()
+            task.standardOutput = outputPipe
+            
+            task.terminationHandler = { _ in
+                let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+                let output = String(data: outputData, encoding: .utf8)
+                let arr: [String] = output!.components(separatedBy: " ")
+                
+                continuation.resume(returning: arr[1])
             }
+            
+            task.launch()
         }
-        // コマンド実行
-        task.launch()
     }
     
     // オーディオファイルを開く
@@ -155,21 +151,22 @@ struct TabAView: View {
     }
     
     func MakeMarkdown() {
-        // mdファイルの名前を取得
-        let mdFilename = getMdFilename()
-        
-        // mdファイルを作成
-        self.Touch(filename: mdFilename)
-        
-        self.progress = "mdファイルを生成しています"
-        
-        print("GetFileSize前")
-        
-        // 音声ファイルのサイズ取得
-        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
-        self.GetFileSize(filename: audioFilename, callback: { out in
-            self.SetMarkdown(sizeStr: out)
-        })
+        Task {
+            do {
+                // mdファイルの名前を取得
+                let mdFilename = getMdFilename()
+                // mdファイルを作成
+                self.Touch(filename: mdFilename)
+                self.progress = "mdファイルを生成しています"
+                print("GetFileSize前")
+                // 音声ファイルのサイズ取得
+                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+                let fileSize = try await self.getFileSize(filename: audioFilename)
+                self.SetMarkdown(sizeStr: fileSize)
+            }catch {
+                print("Error: \(error)")
+            }
+        }
     }
     
     func SetMarkdown(sizeStr: String)
