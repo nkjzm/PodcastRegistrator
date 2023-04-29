@@ -33,7 +33,7 @@ struct Tab_AddUser: View {
 
         configText = configText.replacingOccurrences(of: "author: nkjzm", with: actor)
 
-        SaveTextFile(filePath: configPath, message: configText, callback: { })
+        SaveTextFile(filePath: configPath, message: configText)
 
         showingAlert = true
     }

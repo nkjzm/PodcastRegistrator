@@ -27,11 +27,10 @@ func LoadTextFile(filePath: String) -> String {
 }
 
 /// ファイルを保存する
-func SaveTextFile(filePath: String, message: String, callback: @escaping () -> Void) -> Void {
+func SaveTextFile(filePath: String, message: String) -> Void {
     // 保存処理
     do {
         try message.write(toFile: filePath, atomically: true, encoding: String.Encoding.utf8)
-        callback();
     } catch { }
 }
 

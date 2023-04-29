@@ -32,27 +32,29 @@ struct TabAView: View {
     let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     
     // wavファイルを変換してアートワークを設定する
-    func ConvertToMp3(path: String, filename: String, callback: @escaping () -> Void) -> Void {
-        
-        let noiseProf: String = "\"\(gitRootPath)/noise.prof\""
-        let noiseRemoved: String = "\"\(gitRootPath)/noise_removed.wav\""
-        let silenceRemoved: String = "\"\(gitRootPath)/silence_removed.wav\""
-        let formatConverted: String = "\"\(gitRootPath)/format_converted.mp3\""
-        
-        let task = Process()
-        task.launchPath = "/bin/sh"
-        
-        let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof \(noiseProf);"
-        let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
-        //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
-        let removeSilenceArg = "/usr/local/bin/sox \(noiseRemoved) \(silenceRemoved) silence -l 1 0.2 0% -1 0.8 0%;"
-        let convertArg = "/usr/local/bin/ffmpeg -i \(silenceRemoved) -f mp3 -b:a 192k \(formatConverted) -y;"
-        let addArtworkArg = "/usr/local/bin/ffmpeg -i \(formatConverted) -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename);"
-        let removeFilesArg = "rm \(noiseProf) \(noiseRemoved) \(silenceRemoved) \(formatConverted);"
-        task.arguments = ["-c", createNoiseprofArg + removeNoiseArg + removeSilenceArg + convertArg + addArtworkArg + removeFilesArg]
-        task.terminationHandler = { _ in callback() }
-        // コマンド実行
-        task.launch()
+    func ConvertToMp3(path: String, filename: String) async throws -> Void {
+        return try await withCheckedThrowingContinuation { continuation in
+            
+            let noiseProf: String = "\"\(gitRootPath)/noise.prof\""
+            let noiseRemoved: String = "\"\(gitRootPath)/noise_removed.wav\""
+            let silenceRemoved: String = "\"\(gitRootPath)/silence_removed.wav\""
+            let formatConverted: String = "\"\(gitRootPath)/format_converted.mp3\""
+            
+            let task = Process()
+            task.launchPath = "/bin/sh"
+            
+            let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof \(noiseProf);"
+            let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
+            //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
+            let removeSilenceArg = "/usr/local/bin/sox \(noiseRemoved) \(silenceRemoved) silence -l 1 0.2 0% -1 0.8 0%;"
+            let convertArg = "/usr/local/bin/ffmpeg -i \(silenceRemoved) -f mp3 -b:a 192k \(formatConverted) -y;"
+            let addArtworkArg = "/usr/local/bin/ffmpeg -i \(formatConverted) -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename);"
+            let removeFilesArg = "rm \(noiseProf) \(noiseRemoved) \(silenceRemoved) \(formatConverted);"
+            task.arguments = ["-c", createNoiseprofArg + removeNoiseArg + removeSilenceArg + convertArg + addArtworkArg + removeFilesArg]
+            task.terminationHandler = { _ in continuation.resume() }
+            // コマンド実行
+            task.launch()
+        }
     }
     
     // ファイルを作成
@@ -66,6 +68,7 @@ struct TabAView: View {
         task.launch()
     }
     
+    // ファイルサイズを取得する
     func getFileSize(filename: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             let task = Process()
@@ -90,6 +93,7 @@ struct TabAView: View {
         }
     }
     
+    
     // オーディオファイルを開く
     static func OpenAudio() -> String {
         let openPanel = NSOpenPanel()
@@ -111,31 +115,40 @@ struct TabAView: View {
         return ""
     }
     
-    // Gitリポジトリにアップロード
-    func Upload(audioFilename: String, mdFilename: String, count: Int, callback: @escaping () -> Void) -> Void {
-        let task = Process()
-        // 起動するプログラムを絶対パスで指定
-        task.launchPath = "/bin/sh"
-        // オプションを指定
-        task.arguments = ["-c", "cd \(gitRootPath); pwd; git add \(audioRootPath)/\(audioFilename); git add \(mdRootPath)/\(mdFilename); git commit -m \"Add \(count)\"; git push origin main"]
-        task.terminationHandler = { _ in
-            callback()
+    // GitHubリポジトリにアップロード
+    func uoloadToGitHub(audioFilename: String, mdFilename: String, count: Int) async throws -> Void {
+        return try await withCheckedThrowingContinuation { continuation in
+            
+            let task = Process()
+            // 起動するプログラムを絶対パスで指定
+            task.launchPath = "/bin/sh"
+            // オプションを指定
+            task.arguments = ["-c", "cd \(gitRootPath); pwd; git add \(audioRootPath)/\(audioFilename); git add \(mdRootPath)/\(mdFilename); git commit -m \"Add \(count)\"; git push origin main"]
+            task.terminationHandler = { _ in
+                continuation.resume()
+            }
+            // コマンド実行
+            task.launch()
         }
-        // コマンド実行
-        task.launch()
     }
     
-    // 音声ファイルを変換してGitリポジトリにアップロード
-    func ConvertAndUpload() -> Void {
-        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
-        
-        self.progress = "音声ファイルを変換しています"
-        
-        if(enableConvert) {
-            // 音声ファイルの変換
-            self.ConvertToMp3(path: self.audioPath, filename: audioFilename, callback: { self.MakeMarkdown() })
-        } else {
-            self.MakeMarkdown()
+    // 一連の処理を実行する
+    func execute() -> Void {
+        Task {
+            do {
+                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+                
+                self.progress = "音声ファイルを変換しています"
+                
+                if(enableConvert) {
+                    try await self.ConvertToMp3(path: self.audioPath, filename: audioFilename)
+                }
+                
+                self.MakeMarkdown()
+                
+            }catch {
+                print("Error: \(error)")
+            }
         }
     }
     
@@ -157,12 +170,21 @@ struct TabAView: View {
                 let mdFilename = getMdFilename()
                 // mdファイルを作成
                 self.Touch(filename: mdFilename)
+                
                 self.progress = "mdファイルを生成しています"
-                print("GetFileSize前")
+                
                 // 音声ファイルのサイズ取得
                 let audioFilename = GetAudioName(episodeNumber: episodeNumber)
                 let fileSize = try await self.getFileSize(filename: audioFilename)
                 self.SetMarkdown(sizeStr: fileSize)
+                
+                self.progress = "アップロード中"
+                
+                // Gitリポジトリにアップロード
+                try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
+                
+                self.progress = "アップロード完了!"
+                
             }catch {
                 print("Error: \(error)")
             }
@@ -217,15 +239,7 @@ struct TabAView: View {
         // 保存する場所
         let filePath = "\(mdRootPath)/\(mdFilename)"
         
-        SaveTextFile(filePath: filePath, message: message, callback: {
-            
-            self.progress = "アップロード中"
-            
-            // Gitリポジトリにアップロード
-            self.Upload(audioFilename: audioFilename, mdFilename: mdFilename, count: episodeNumber, callback: {
-                self.progress = "アップロード完了!"
-            })
-        })
+        SaveTextFile(filePath: filePath, message: message)
     }
     
     
@@ -278,7 +292,7 @@ struct TabAView: View {
                 Text("変換処理を有効にする")
             }.padding()
             Button(action: {
-                self.ConvertAndUpload()
+                self.execute()
             }) {
                 Text("アップロード")
             }.padding()
