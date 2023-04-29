@@ -23,31 +23,57 @@ struct UploadView: View {
         "",
     ]
     
-    @State private var progress: String = "処理開始前"
-    @State var date = Date()
-    @State var progressValue: CGFloat = 0.3
+    @State private var progressTexts: [String] = [
+        "",
+        "開始しました",
+        "音声ファイルを変換しています",
+        "mdファイルを生成しています",
+        "アップロード中",
+        "完了",
+    ]
     
+    struct progressStyle {
+        var textColor : Color
+        var imageColor : Color
+        var fontWeight : Font.Weight
+    }
+    
+    private let doneStyle = progressStyle(textColor: .primary, imageColor: .secondary, fontWeight: .regular)
+    private let doingStyle = progressStyle(textColor: .primary, imageColor: .accentColor, fontWeight: .bold)
+    private let todoStyle = progressStyle(textColor: Color(NSColor.tertiaryLabelColor), imageColor: Color(NSColor.tertiaryLabelColor), fontWeight: .regular)
+    
+    @State var date = Date()
+    
+    @State var progressIndex: Int = 0
+    @State var progressValue: CGFloat = 0
+    
+    func updateProgress(index: Int) -> Void {
+        progressIndex = index
+        progressValue = CGFloat(index) / CGFloat(progressTexts.count - 1)
+    }
     
     // 一連の処理を実行する
     func execute() -> Void {
         Task {
             do {
-                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+                updateProgress(index: 1)
                 
+                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+
                 if(enableConvert) {
-                    self.progress = "音声ファイルを変換しています"
+                    updateProgress(index: 2)
                     try await self.convertToMp3(path: self.audioPath, filename: audioFilename)
                 }
-                
+
                 // mdファイルを作成
+                updateProgress(index: 3)
                 let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
                 
                 // Gitリポジトリにアップロード
-                self.progress = "アップロード中"
+                updateProgress(index: 4)
                 // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
-                
-                self.progress = "アップロード完了!"
-                
+
+                updateProgress(index: 5)
             }catch {
                 print("Error: \(error)")
             }
@@ -153,8 +179,6 @@ struct UploadView: View {
         // mdファイルを作成
         self.touch(filename: mdFilename)
         
-        self.progress = "mdファイルを生成しています"
-        
         // 音声ファイルのサイズ取得
         let fileSize = try await self.getFileSize(filename: audioFilename)
         self.setMarkdown(sizeStr: fileSize, audioFilename: audioFilename)
@@ -212,8 +236,6 @@ struct UploadView: View {
             
             \(self.content)
             """
-        
-        self.progress = "mdファイルを書き込んでいます"
         
         // mdファイルに書き込み
         let mdFilename = getMdFilename()
@@ -279,29 +301,16 @@ struct UploadView: View {
                         .frame(width: 100, height: 100)
                         .padding(32.0)
                     VStack(alignment: .leading, spacing: 10) {
-                        Label(
-                            title: { Text("開始しました") },
-                            icon: { Image(systemName: "circlebadge.fill").foregroundColor(.secondary)}
-                        )
-                        Label(
-                            title: { Text("音声ファイルを変換しています").bold() },
-                            icon: { Image(systemName: "circlebadge.fill").foregroundColor(.accentColor)}
-                        )
-                        Label(
-                            title: { Text("アップロード中") },
-                            icon: { Image(systemName: "circlebadge.fill") }
-                        ).foregroundColor(Color(NSColor.tertiaryLabelColor))
-                        Label(
-                            title: { Text("完了") },
-                            icon: { Image(systemName: "circlebadge.fill") }
-                        ).foregroundColor(Color(NSColor.tertiaryLabelColor))
-
+                        
+                        ForEach(1..<progressTexts.count, id: \.self) { num in
+                            let style = num < progressIndex ? doneStyle : ( num == progressIndex ? doingStyle : todoStyle)
+                            Label(
+                                title: { Text(progressTexts[num]).foregroundColor(style.textColor).fontWeight(style.fontWeight) },
+                                icon: { Image(systemName: "circlebadge.fill").foregroundColor(style.imageColor)}
+                            )
+                        }
+                        
                     }.padding().frame(maxWidth: .infinity)
-                }
-                
-                HStack(alignment: .center) {
-                    Text("進捗状況").frame(width: 100)
-                    Text(verbatim: progress)
                 }
                 Spacer()
             }.frame(width: 400)
