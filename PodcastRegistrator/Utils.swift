@@ -1,19 +1,25 @@
 import Foundation
 import SwiftUI
 
+var gitRootPath: String { UserDefaults.standard.string(forKey: "gitRootPath")! }
+var artworkPath: String { UserDefaults.standard.string(forKey: "artworkPath")! }
+
+var audioRootPath: String { "\(gitRootPath)/audio" }
+var mdRootPath: String { "\(gitRootPath)/_posts"}
+
 /// オーディオ名を取得
 func GetAudioName(episodeNumber: Int) -> String {
-    return "xrfm_\(String(format: "%03d", episodeNumber)).mp3"
+    return String(format: "xrfm_%03d.mp3", episodeNumber)
 }
 
 /// Rawオーディオ名を取得
 func GetRawAudioName(episodeNumber: Int) -> String {
-    return "xrfm_\(String(format: "%03d", episodeNumber))_raw.mp3"
+    return String(format: "xrfm_%03d_raw.mp3", episodeNumber)
 }
 
 /// 動画名を取得
 func GetMovieName(episodeNumber: Int) -> String {
-    return "xrfm_\(String(format: "%03d", episodeNumber)).mp4"
+    return String(format: "xrfm_%03d.mp4", episodeNumber)
 }
 
 /// ファイルを読み込む
@@ -34,15 +40,22 @@ func SaveTextFile(filePath: String, message: String) -> Void {
     } catch { }
 }
 
+// ファイルパスから画像をロードする関数
+func loadImage(from path: String) -> NSImage? {
+    let url = URL(fileURLWithPath: path)
+    guard let image = NSImage(contentsOf: url) else { return nil }
+    return image
+}
+
 /// 画像を開く
-func OpenImage() -> String {
+func openImage() -> String {
     let openPanel = NSOpenPanel()
     openPanel.allowsMultipleSelection = false //複数ファイルの選択
     openPanel.canChooseDirectories = false //ディレクトリの選択
     openPanel.canCreateDirectories = false //ディレクトリの作成
     openPanel.canChooseFiles = true //ファイルの選択
     openPanel.allowedFileTypes = ["jpg", "png"] //ファイルの種類
-
+    
     let reault = openPanel.runModal()
     if(reault == NSApplication.ModalResponse.OK) {
         if let panelURL = openPanel.url {
@@ -74,3 +87,4 @@ func openAudio() -> String {
     }
     return ""
 }
+

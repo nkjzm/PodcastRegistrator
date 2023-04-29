@@ -9,11 +9,7 @@ struct ConvertToVideoView: View {
     @State private var enableMultipleConvert = false
     @State private var valueAmount: Float = -1;
 
-    let gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io"
-    let audioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
     let movieRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/movie"
-    let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
-    let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     let thubnailPath: String = "/Users/nkjzm/Projects/xrfm.github.io/images/thumbnail.png"
 
     func Convert(callback: @escaping () -> Void) -> Void {
@@ -34,7 +30,7 @@ struct ConvertToVideoView: View {
 
     func convertMultiple()
     {
-        let files = getFileInfoListInDir(self.audioRootPath)
+        let files = getFileInfoListInDir(audioRootPath)
         let rate: Float = 100.0 / Float(files.count)
 
         for (_, file) in files.enumerated() {
@@ -53,7 +49,7 @@ struct ConvertToVideoView: View {
 
     func convert(episodeNumber: Int, rate: Float)
     {
-        let original = "\(self.audioRootPath)/\(GetAudioName(episodeNumber: episodeNumber))"
+        let original = "\(audioRootPath)/\(GetAudioName(episodeNumber: episodeNumber))"
         let outputFilePath = "\(self.movieRootPath)/\(GetMovieName(episodeNumber: episodeNumber))"
 
         progress = "変換開始: " + String(episodeNumber)

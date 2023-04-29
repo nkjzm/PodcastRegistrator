@@ -26,11 +26,6 @@ struct UploadView: View {
     @State private var progress: String = "処理開始前"
     @State var date = Date()
     
-    @AppStorage("gitRootPath") private var gitRootPath: String = ""
-    @AppStorage("audioRootPath") private var audioRootPath: String = ""
-    @AppStorage("mdRootPath") private var mdRootPath: String = ""
-    @AppStorage("artworkPath") private var artworkPath: String = ""
-    
     // 一連の処理を実行する
     func execute() -> Void {
         Task {
@@ -182,7 +177,7 @@ struct UploadView: View {
         let size = String(format: "%.01f", Float(sizeStr)! / 1000000)
         
         // 音声の長さを取得
-        let asset = AVURLAsset(url: URL(fileURLWithPath: "\(self.audioRootPath)/\(audioFilename)"))
+        let asset = AVURLAsset(url: URL(fileURLWithPath: "\(audioRootPath)/\(audioFilename)"))
         let duration = Double(CMTimeGetSeconds(asset.duration))
         
         // 秒数を時間に整形

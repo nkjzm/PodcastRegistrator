@@ -9,18 +9,12 @@ struct ConvertAudioView: View {
     @State private var enableSavingPreConvertedFile = true
     // @State private var enableOptimization = false
     @State private var valueAmount: Float = -1;
-
-    let gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io"
-    let audioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/audio"
     let rawAudioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/raw-audio"
-    let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/_posts"
-    let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
 
     func Convert(callback: @escaping () -> Void) -> Void {
 
         progress = "変換処理開始"
         self.valueAmount = 0
-
 
         if enableSavingPreConvertedFile
         {
@@ -56,10 +50,6 @@ struct ConvertAudioView: View {
 
 
         }
-
-        //        if enableOptimization
-        //        {
-        //        }
 
         callback()
     }
