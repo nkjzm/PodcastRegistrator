@@ -16,6 +16,8 @@
 		24DAAE4029FCD54800208869 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE3F29FCD54800208869 /* SettingsView.swift */; };
 		24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */; };
 		24DAAE4429FCD59300208869 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */; };
+		24DAAE4829FD422400208869 /* CircularProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4729FD422400208869 /* CircularProgressBar.swift */; };
+		24DAAE4A29FD471000208869 /* Color.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24DAAE4929FD471000208869 /* Color.xcassets */; };
 		24F4D347238D74C500970A73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F4D346238D74C500970A73 /* ContentView.swift */; };
 		24F4D349238D74C800970A73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F4D348238D74C800970A73 /* Assets.xcassets */; };
 		24F4D34C238D74C800970A73 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F4D34B238D74C800970A73 /* Preview Assets.xcassets */; };
@@ -32,6 +34,8 @@
 		24DAAE3F29FCD54800208869 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
+		24DAAE4729FD422400208869 /* CircularProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressBar.swift; sourceTree = "<group>"; };
+		24DAAE4929FD471000208869 /* Color.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Color.xcassets; sourceTree = "<group>"; };
 		24F4D341238D74C500970A73 /* PodcastRegistrator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PodcastRegistrator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F4D346238D74C500970A73 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		24F4D348238D74C800970A73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -71,8 +75,10 @@
 		24F4D343238D74C500970A73 /* PodcastRegistrator */ = {
 			isa = PBXGroup;
 			children = (
+				24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */,
 				24F4D346238D74C500970A73 /* ContentView.swift */,
 				24F4D348238D74C800970A73 /* Assets.xcassets */,
+				24DAAE4929FD471000208869 /* Color.xcassets */,
 				24F4D34D238D74C800970A73 /* Main.storyboard */,
 				24F4D350238D74C800970A73 /* Info.plist */,
 				24F4D351238D74C800970A73 /* PodcastRegistrator.entitlements */,
@@ -82,10 +88,10 @@
 				246EE76327CD861800A1F5E4 /* ConvertToVideoView.swift */,
 				2476C9E727D339AA00066001 /* Utils.swift */,
 				24A9098427EFFD72002E6E9B /* AddUserView.swift */,
-				24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */,
 				24DAAE3F29FCD54800208869 /* SettingsView.swift */,
 				24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */,
 				24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */,
+				24DAAE4729FD422400208869 /* CircularProgressBar.swift */,
 			);
 			path = PodcastRegistrator;
 			sourceTree = "<group>";
@@ -157,6 +163,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24F4D34F238D74C800970A73 /* Main.storyboard in Resources */,
+				24DAAE4A29FD471000208869 /* Color.xcassets in Resources */,
 				24F4D34C238D74C800970A73 /* Preview Assets.xcassets in Resources */,
 				24F4D349238D74C800970A73 /* Assets.xcassets in Resources */,
 			);
@@ -174,6 +181,7 @@
 				24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */,
 				24DAAE4429FCD59300208869 /* AdvancedSettingsView.swift in Sources */,
 				24F4D347238D74C500970A73 /* ContentView.swift in Sources */,
+				24DAAE4829FD422400208869 /* CircularProgressBar.swift in Sources */,
 				2491B8E925E9C9DC00916202 /* ConvertAudioView.swift in Sources */,
 				24DAAE3E29FCD29300208869 /* PodcastRegistratorApp.swift in Sources */,
 				2491B8E625E9C9BA00916202 /* UploadView.swift in Sources */,

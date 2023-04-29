@@ -25,6 +25,8 @@ struct UploadView: View {
     
     @State private var progress: String = "処理開始前"
     @State var date = Date()
+    @State var progressValue: CGFloat = 0.3
+    
     
     // 一連の処理を実行する
     func execute() -> Void {
@@ -220,67 +222,90 @@ struct UploadView: View {
         
         SaveTextFile(filePath: filePath, message: message)
     }
-
+    
     
     var body: some View {
-        VStack {
-            VStack (spacing: 10) {
-                Text("エピソードの情報を入力してください").frame(maxWidth: .infinity)
-                HStack(alignment: .center) {
-                    Text("ファイル") .frame(width: 100)
-                    Text("\(self.audioPath)").frame(maxWidth: .infinity)
-                    Button(action: {
-                        self.audioPath = openAudio()
-                    }) {
-                        Text("オーディオファイルを開く")
-                    }
-                }
-                HStack(alignment: .center) {
-                    Text("回数") .frame(width: 100)
-                    TextField("0", value: $episodeNumber, formatter: NumberFormatter())
-                }
-                DatePicker(selection: $date, in: ...Date(), displayedComponents: .date) {
-                    Text("収録日") .frame(width: 100)
-                }
-                HStack(alignment: .center) {
-                    Text("タイトル") .frame(width: 100)
-                    Spacer()
-                    TextField("エピソードのタイトルを入力", text: $title)
-                }
-                HStack(alignment: .center) {
-                    Text("内容") .frame(width: 100, height: 100)
-                    Spacer()
-                    TextEditor(text: $description)
-                }
-                HStack(alignment: .center) {
-                    Text("関連リンク").frame(width: 100, height: 100)
-                    Spacer()
-                    TextEditor(text: $content)
-                }
-            }
-            VStack (spacing: 0) {
-                ForEach(0..<array.count) { num in
+        HStack{
+            VStack {
+                VStack (spacing: 10) {
+                    Text("エピソードの情報を入力してください").frame(maxWidth: .infinity)
                     HStack(alignment: .center) {
-                        Text("ゲスト: \(num + 1)") .frame(width: 100)
+                        Text("ファイル") .frame(width: 100)
+                        Text("\(self.audioPath)").frame(maxWidth: .infinity)
+                        Button(action: {
+                            self.audioPath = openAudio()
+                        }) {
+                            Text("オーディオファイルを開く")
+                        }
+                    }
+                    HStack(alignment: .center) {
+                        Text("回数") .frame(width: 100)
+                        TextField("0", value: $episodeNumber, formatter: NumberFormatter())
+                    }
+                    DatePicker(selection: $date, in: ...Date(), displayedComponents: .date) {
+                        Text("収録日") .frame(width: 100)
+                    }
+                    HStack(alignment: .center) {
+                        Text("タイトル") .frame(width: 100)
                         Spacer()
-                        TextField("nkjzm", text: $array[num])
+                        TextField("エピソードのタイトルを入力", text: $title)
+                    }
+                    HStack(alignment: .center) {
+                        Text("内容") .frame(width: 100, height: 100)
+                        Spacer()
+                        TextEditor(text: $description)
+                    }
+                    HStack(alignment: .center) {
+                        Text("関連リンク").frame(width: 100, height: 100)
+                        Spacer()
+                        TextEditor(text: $content)
                     }
                 }
-            }.padding(.leading)
-            Toggle(isOn: $enableConvert) {
-                Text("変換処理を有効にする")
-            }.padding()
-            Button(action: {
-                self.execute()
-            }) {
-                Text("アップロード")
-            }.padding()
-            HStack(alignment: .center) {
-                Text("進捗状況").frame(width: 100)
-                Text(verbatim: progress)
+                VStack (spacing: 0) {
+                    ForEach(0..<array.count, id: \.self) { num in
+                        HStack(alignment: .center) {
+                            Text("ゲスト: \(num + 1)") .frame(width: 100)
+                            Spacer()
+                            TextField("nkjzm", text: $array[num])
+                        }
+                    }
+                }.padding(.leading)
+            }.padding().frame(width: 400)
+            VStack {
+                Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
+                Button("アップロード", action: {self.execute()} ).padding()
+                HStack{
+                    CircularProgressBar(progress: $progressValue)
+                        .frame(width: 100, height: 100)
+                        .padding(32.0)
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label(
+                            title: { Text("開始しました") },
+                            icon: { Image(systemName: "circlebadge.fill").foregroundColor(.secondary)}
+                        )
+                        Label(
+                            title: { Text("音声ファイルを変換しています").bold() },
+                            icon: { Image(systemName: "circlebadge.fill").foregroundColor(.accentColor)}
+                        )
+                        Label(
+                            title: { Text("アップロード中") },
+                            icon: { Image(systemName: "circlebadge.fill") }
+                        ).foregroundColor(Color(NSColor.tertiaryLabelColor))
+                        Label(
+                            title: { Text("完了") },
+                            icon: { Image(systemName: "circlebadge.fill") }
+                        ).foregroundColor(Color(NSColor.tertiaryLabelColor))
+
+                    }.padding().frame(maxWidth: .infinity)
+                }
+                
+                HStack(alignment: .center) {
+                    Text("進捗状況").frame(width: 100)
+                    Text(verbatim: progress)
+                }
                 Spacer()
-            }
-        }.padding().frame(width: 400)
+            }.frame(width: 400)
+        }
     }
 }
 

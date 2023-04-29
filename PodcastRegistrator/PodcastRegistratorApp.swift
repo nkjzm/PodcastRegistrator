@@ -4,7 +4,7 @@ import SwiftUI
 struct LifeCycleSwiftUIApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView().frame(width: 500)
+            ContentView().frame(minWidth: 800)
         }
         #if os(macOS)
         Settings {
