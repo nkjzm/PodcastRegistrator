@@ -6,10 +6,7 @@ struct AddUserView: View {
     @AppStorage("guestUserId") private var userId: String = ""
     @State private var imagePath: String = "未選択"
     @State private var showingAlert = false
-    
-    let imageRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/images/actors/"
-    let configPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_config.yml"
-    
+        
     func Convert() -> Void {
         
         // 拡張子を取得
@@ -18,7 +15,7 @@ struct AddUserView: View {
         
         let imageName = userId + pathExtension
         // アイコンを保存
-        SameImage(sourcePath: imagePath, outputPath: imageRootPath + imageName)
+        SameImage(sourcePath: imagePath, outputPath: "\(actorImageRootPath)/\(imageName)")
         
         print(LoadTextFile(filePath: configPath))
         var configText = LoadTextFile(filePath: configPath)

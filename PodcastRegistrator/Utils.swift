@@ -1,11 +1,19 @@
 import Foundation
 import SwiftUI
 
-var gitRootPath: String { UserDefaults.standard.string(forKey: "gitRootPath")! }
+var repositoryRootPath: String { UserDefaults.standard.string(forKey: "repositoryRootPath")! }
 var artworkPath: String { UserDefaults.standard.string(forKey: "artworkPath")! }
 
+var gitRootPath: String { "\(repositoryRootPath)/docs" }
+
+var configPath: String { "\(gitRootPath)/_config.yml" }
 var audioRootPath: String { "\(gitRootPath)/audio" }
 var mdRootPath: String { "\(gitRootPath)/_posts"}
+var movieThubnailPath: String { "\(gitRootPath)/images/thumbnail.png" }
+var actorImageRootPath: String { "\(gitRootPath)/movie/actors" }
+
+var rawAudioRootPath: String { "\(repositoryRootPath)/raw-audio" }
+var movieRootPath: String { "\(repositoryRootPath)/movie" }
 
 /// オーディオ名を取得
 func GetAudioName(episodeNumber: Int) -> String {

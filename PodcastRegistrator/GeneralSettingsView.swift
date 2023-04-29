@@ -10,7 +10,7 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
     
-    @AppStorage("gitRootPath") var gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs"
+    @AppStorage("repositoryRootPath") var gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io"
     @AppStorage("artworkPath") var artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     
     var body: some View {

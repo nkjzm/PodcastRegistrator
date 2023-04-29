@@ -9,7 +9,6 @@ struct ConvertAudioView: View {
     @State private var enableSavingPreConvertedFile = true
     // @State private var enableOptimization = false
     @State private var valueAmount: Float = -1;
-    let rawAudioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/raw-audio"
 
     func Convert(callback: @escaping () -> Void) -> Void {
 
@@ -19,7 +18,7 @@ struct ConvertAudioView: View {
         if enableSavingPreConvertedFile
         {
 
-            let files = getFileInfoListInDir("\(self.rawAudioRootPath)/wav")
+            let files = getFileInfoListInDir("\(rawAudioRootPath)/wav")
 
             let rate: Float = 100.0 / Float(files.count)
 
@@ -34,9 +33,9 @@ struct ConvertAudioView: View {
                 let episodeNumber = Int(number)!
 
 
-                let original = "\(self.rawAudioRootPath)/wav/\(number).wav"
+                let original = "\(rawAudioRootPath)/wav/\(number).wav"
 
-                let outputFilePath = "\(self.rawAudioRootPath)/\(GetRawAudioName(episodeNumber: episodeNumber))"
+                let outputFilePath = "\(rawAudioRootPath)/\(GetRawAudioName(episodeNumber: episodeNumber))"
 
                 progress = "変換開始: " + number
 

@@ -9,8 +9,6 @@ struct ConvertToVideoView: View {
     @State private var enableMultipleConvert = false
     @State private var valueAmount: Float = -1;
 
-    let movieRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/movie"
-    let thubnailPath: String = "/Users/nkjzm/Projects/xrfm.github.io/images/thumbnail.png"
 
     func Convert(callback: @escaping () -> Void) -> Void {
 
@@ -50,7 +48,7 @@ struct ConvertToVideoView: View {
     func convert(episodeNumber: Int, rate: Float)
     {
         let original = "\(audioRootPath)/\(GetAudioName(episodeNumber: episodeNumber))"
-        let outputFilePath = "\(self.movieRootPath)/\(GetMovieName(episodeNumber: episodeNumber))"
+        let outputFilePath = "\(movieRootPath)/\(GetMovieName(episodeNumber: episodeNumber))"
 
         progress = "変換開始: " + String(episodeNumber)
 
@@ -82,7 +80,7 @@ struct ConvertToVideoView: View {
             -t `/usr/local/bin/ffprobe -v error -i \(path) -show_format | grep duration= | cut -d '=' -f 2` \
             -loop 1 \
             -r 1 \
-            -i \(self.thubnailPath) \
+            -i \(movieThubnailPath) \
             -i \(path) \
             -vcodec libx264 \
             -pix_fmt yuv420p \
