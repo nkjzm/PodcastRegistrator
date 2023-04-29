@@ -31,7 +31,6 @@ struct SettingsView: View {
                 .tag(Tabs.advanced)
         }
         .padding(20)
-        .frame(width: 375, height: 150)
     }
 }
 

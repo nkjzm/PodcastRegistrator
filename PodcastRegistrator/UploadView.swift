@@ -26,10 +26,10 @@ struct UploadView: View {
     @State private var progress: String = "処理開始前"
     @State var date = Date()
     
-    let gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs"
-    let audioRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/audio"
-    let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_posts"
-    let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
+    @AppStorage("gitRootPath") private var gitRootPath: String = ""
+    @AppStorage("audioRootPath") private var audioRootPath: String = ""
+    @AppStorage("mdRootPath") private var mdRootPath: String = ""
+    @AppStorage("artworkPath") private var artworkPath: String = ""
     
     // 一連の処理を実行する
     func execute() -> Void {
@@ -69,14 +69,27 @@ struct UploadView: View {
             let task = Process()
             task.launchPath = "/bin/sh"
             
+            // ノイズ除去の事前ファイル作成
             let createNoiseprofArg = "/usr/local/bin/sox \"\(path)\" -n noiseprof \(noiseProf);"
+            // ノイズ除去
             let removeNoiseArg = "/usr/local/bin/sox \"\(path)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
             //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
+            
+            // 無音区間の削除
             let removeSilenceArg = "/usr/local/bin/sox \(noiseRemoved) \(silenceRemoved) silence -l 1 0.2 0% -1 0.8 0%;"
+            
+            // mp3に変換
             let convertArg = "/usr/local/bin/ffmpeg -i \(silenceRemoved) -f mp3 -b:a 192k \(formatConverted) -y;"
+            
+            // アートワークの設定
             let addArtworkArg = "/usr/local/bin/ffmpeg -i \(formatConverted) -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(audioRootPath)/\(filename);"
+            
+            // 使い終わった不要なファイルを削除
             let removeFilesArg = "rm \(noiseProf) \(noiseRemoved) \(silenceRemoved) \(formatConverted);"
+            
+            // まとめて引数に設定
             task.arguments = ["-c", createNoiseprofArg + removeNoiseArg + removeSilenceArg + convertArg + addArtworkArg + removeFilesArg]
+            // 終了後の処理
             task.terminationHandler = { _ in continuation.resume() }
             // コマンド実行
             task.launch()
@@ -216,7 +229,7 @@ struct UploadView: View {
     
     var body: some View {
         VStack {
-            VStack (spacing: 5) {
+            VStack (spacing: 10) {
                 Text("エピソードの情報を入力してください").frame(maxWidth: .infinity)
                 HStack(alignment: .center) {
                     Text("ファイル") .frame(width: 100)
@@ -240,9 +253,9 @@ struct UploadView: View {
                     TextField("エピソードのタイトルを入力", text: $title)
                 }
                 HStack(alignment: .center) {
-                    Text("内容") .frame(width: 100)
+                    Text("内容") .frame(width: 100, height: 100)
                     Spacer()
-                    TextField("エピソードの説明を入力", text: $description)
+                    TextEditor(text: $description)
                 }
                 HStack(alignment: .center) {
                     Text("関連リンク").frame(width: 100, height: 100)
