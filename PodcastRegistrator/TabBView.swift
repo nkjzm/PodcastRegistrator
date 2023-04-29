@@ -103,7 +103,7 @@ struct TabBView: View {
                 Text("ファイル").frame(width: 100)
                 Text("\(self.audioPath)").frame(maxWidth: .infinity)
                 Button(action: {
-                    self.audioPath = TabAView.OpenAudio()
+                    self.audioPath = openAudio()
                 }) {
                     Text("オーディオファイルを開く")
                 }

@@ -108,28 +108,6 @@ struct TabAView: View {
         }
     }
     
-    
-    // オーディオファイルを開く
-    static func OpenAudio() -> String {
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false //複数ファイルの選択
-        openPanel.canChooseDirectories = false //ディレクトリの選択
-        openPanel.canCreateDirectories = false //ディレクトリの作成
-        openPanel.canChooseFiles = true //ファイルの選択
-        openPanel.allowedFileTypes = ["wav", "mp3"] //ファイルの種類
-        
-        let reault = openPanel.runModal()
-        if(reault == NSApplication.ModalResponse.OK) {
-            if let panelURL = openPanel.url {
-                
-                let path: String = panelURL.path
-                print(path)
-                return path
-            }
-        }
-        return ""
-    }
-    
     // GitHubリポジトリにアップロード
     func uoloadToGitHub(audioFilename: String, mdFilename: String, count: Int) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
