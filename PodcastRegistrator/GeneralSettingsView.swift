@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct GeneralSettingsView: View {
-
+    
     @AppStorage("gitRootPath") var gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs"
     @AppStorage("artworkPath") var artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
-
+    
     var body: some View {
         VStack (spacing: 10) {
             
@@ -32,11 +32,14 @@ struct GeneralSettingsView: View {
                     } else {
                         Text("画像が見つかりません")
                     }
-                    Button(action: {
-                        self.artworkPath = openImage()
-                    }) {
-                        Text("アートワーク画像を選択")
-                    }.frame(maxWidth: .infinity)
+                    HStack(alignment: .center) {
+                        Text(self.artworkPath)
+                        Button(action: {
+                            self.artworkPath = openImage()
+                        }) {
+                            Text("アートワーク画像を選択")
+                        }.frame(maxWidth: .infinity)
+                    }
                 }
             }
             

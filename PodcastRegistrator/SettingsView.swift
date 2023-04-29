@@ -31,6 +31,7 @@ struct SettingsView: View {
                 .tag(Tabs.advanced)
         }
         .padding(20)
+        Spacer()
     }
 }
 

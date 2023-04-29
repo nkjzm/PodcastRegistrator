@@ -69,11 +69,14 @@ struct AddUserView: View {
                     } else {
                         Text("画像が見つかりません")
                     }
-                    Button(action: {
-                        self.imagePath = openImage()
-                    }) {
-                        Text("アイコン画像を選択")
-                    }.frame(maxWidth: .infinity)
+                    HStack(alignment: .center) {
+                        Text(self.imagePath)
+                        Button(action: {
+                            self.imagePath = openImage()
+                        }) {
+                            Text("アイコン画像を選択")
+                        }.frame(maxWidth: .infinity)
+                    }
                 }
             }
             Button(action: { self.Convert() }) {
