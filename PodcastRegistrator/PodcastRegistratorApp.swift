@@ -6,5 +6,10 @@ struct LifeCycleSwiftUIApp: App {
         WindowGroup {
             ContentView().frame(width: 500)
         }
+        #if os(macOS)
+        Settings {
+            SettingsView()
+        }
+        #endif
     }
 }

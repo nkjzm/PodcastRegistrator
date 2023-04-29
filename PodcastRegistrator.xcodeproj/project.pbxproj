@@ -13,6 +13,9 @@
 		2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2491B8E825E9C9DC00916202 /* TabBView.swift */; };
 		24A9098527EFFD72002E6E9B /* Tab_AddUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */; };
 		24DAAE3E29FCD29300208869 /* PodcastRegistratorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */; };
+		24DAAE4029FCD54800208869 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE3F29FCD54800208869 /* SettingsView.swift */; };
+		24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */; };
+		24DAAE4429FCD59300208869 /* AdvancedSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */; };
 		24F4D347238D74C500970A73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F4D346238D74C500970A73 /* ContentView.swift */; };
 		24F4D349238D74C800970A73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F4D348238D74C800970A73 /* Assets.xcassets */; };
 		24F4D34C238D74C800970A73 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 24F4D34B238D74C800970A73 /* Preview Assets.xcassets */; };
@@ -26,6 +29,9 @@
 		2491B8E825E9C9DC00916202 /* TabBView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBView.swift; sourceTree = "<group>"; };
 		24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tab_AddUser.swift; sourceTree = "<group>"; };
 		24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastRegistratorApp.swift; sourceTree = "<group>"; };
+		24DAAE3F29FCD54800208869 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsView.swift; sourceTree = "<group>"; };
 		24F4D341238D74C500970A73 /* PodcastRegistrator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PodcastRegistrator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F4D346238D74C500970A73 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		24F4D348238D74C800970A73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -77,6 +83,9 @@
 				2476C9E727D339AA00066001 /* Utils.swift */,
 				24A9098427EFFD72002E6E9B /* Tab_AddUser.swift */,
 				24DAAE3D29FCD29300208869 /* PodcastRegistratorApp.swift */,
+				24DAAE3F29FCD54800208869 /* SettingsView.swift */,
+				24DAAE4129FCD58800208869 /* GeneralSettingsView.swift */,
+				24DAAE4329FCD59300208869 /* AdvancedSettingsView.swift */,
 			);
 			path = PodcastRegistrator;
 			sourceTree = "<group>";
@@ -161,6 +170,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				246EE76427CD861800A1F5E4 /* TabCView.swift in Sources */,
+				24DAAE4029FCD54800208869 /* SettingsView.swift in Sources */,
+				24DAAE4229FCD58800208869 /* GeneralSettingsView.swift in Sources */,
+				24DAAE4429FCD59300208869 /* AdvancedSettingsView.swift in Sources */,
 				24F4D347238D74C500970A73 /* ContentView.swift in Sources */,
 				2491B8E925E9C9DC00916202 /* TabBView.swift in Sources */,
 				24DAAE3E29FCD29300208869 /* PodcastRegistratorApp.swift in Sources */,
