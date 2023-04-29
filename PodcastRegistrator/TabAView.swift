@@ -232,8 +232,7 @@ struct TabAView: View {
     var body: some View {
         VStack {
             VStack (spacing: 5) {
-                Text("エピソードの情報を入力してください")
-                    .frame(maxWidth: .infinity)
+                Text("エピソードの情報を入力してください").frame(maxWidth: .infinity)
                 HStack(alignment: .center) {
                     Text("ファイル") .frame(width: 100)
                     Text("\(self.audioPath)").frame(maxWidth: .infinity)
@@ -247,9 +246,7 @@ struct TabAView: View {
                     Text("回数") .frame(width: 100)
                     TextField("0", value: $episodeNumber, formatter: NumberFormatter())
                 }
-                DatePicker(selection: $date,
-                           in: ...Date(), displayedComponents: .date
-                ) {
+                DatePicker(selection: $date, in: ...Date(), displayedComponents: .date) {
                     Text("収録日") .frame(width: 100)
                 }
                 HStack(alignment: .center) {
@@ -286,8 +283,7 @@ struct TabAView: View {
                 Text("アップロード")
             }.padding()
             HStack(alignment: .center) {
-                Text("進捗状況")
-                    .frame(width: 100)
+                Text("進捗状況").frame(width: 100)
                 Text(verbatim: progress)
                 Spacer()
             }
