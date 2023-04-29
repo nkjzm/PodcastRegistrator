@@ -31,8 +31,34 @@ struct TabAView: View {
     let mdRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io/docs/_posts"
     let artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
     
+    // 一連の処理を実行する
+    func execute() -> Void {
+        Task {
+            do {
+                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
+                
+                if(enableConvert) {
+                    self.progress = "音声ファイルを変換しています"
+                    try await self.convertToMp3(path: self.audioPath, filename: audioFilename)
+                }
+                
+                // mdファイルを作成
+                let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
+                
+                // Gitリポジトリにアップロード
+                self.progress = "アップロード中"
+                try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
+                
+                self.progress = "アップロード完了!"
+                
+            }catch {
+                print("Error: \(error)")
+            }
+        }
+    }
+    
     // wavファイルを変換してアートワークを設定する
-    func ConvertToMp3(path: String, filename: String) async throws -> Void {
+    func convertToMp3(path: String, filename: String) async throws -> Void {
         return try await withCheckedThrowingContinuation { continuation in
             
             let noiseProf: String = "\"\(gitRootPath)/noise.prof\""
@@ -55,17 +81,6 @@ struct TabAView: View {
             // コマンド実行
             task.launch()
         }
-    }
-    
-    // ファイルを作成
-    func Touch(filename: String) -> Void {
-        let task = Process()
-        // 起動するプログラムを絶対パスで指定
-        task.launchPath = "/usr/bin/touch"
-        // オプションを指定
-        task.arguments = ["\(mdRootPath)/\(filename)"]
-        // コマンド実行
-        task.launch()
     }
     
     // ファイルサイズを取得する
@@ -132,25 +147,6 @@ struct TabAView: View {
         }
     }
     
-    // 一連の処理を実行する
-    func execute() -> Void {
-        Task {
-            do {
-                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
-                
-                self.progress = "音声ファイルを変換しています"
-                
-                if(enableConvert) {
-                    try await self.ConvertToMp3(path: self.audioPath, filename: audioFilename)
-                }
-                
-                self.MakeMarkdown()
-                
-            }catch {
-                print("Error: \(error)")
-            }
-        }
-    }
     
     func getDateStr() -> String {
         let dateFormatter = DateFormatter()
@@ -163,41 +159,38 @@ struct TabAView: View {
         return "\(dateStr)-\(episodeNumber).md"
     }
     
-    func MakeMarkdown() {
-        Task {
-            do {
-                // mdファイルの名前を取得
-                let mdFilename = getMdFilename()
-                // mdファイルを作成
-                self.Touch(filename: mdFilename)
-                
-                self.progress = "mdファイルを生成しています"
-                
-                // 音声ファイルのサイズ取得
-                let audioFilename = GetAudioName(episodeNumber: episodeNumber)
-                let fileSize = try await self.getFileSize(filename: audioFilename)
-                self.SetMarkdown(sizeStr: fileSize)
-                
-                self.progress = "アップロード中"
-                
-                // Gitリポジトリにアップロード
-                try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
-                
-                self.progress = "アップロード完了!"
-                
-            }catch {
-                print("Error: \(error)")
-            }
-        }
+    func makeMarkdown(audioFilename: String) async throws -> String {
+        // mdファイルの名前を取得
+        let mdFilename = getMdFilename()
+        // mdファイルを作成
+        self.touch(filename: mdFilename)
+        
+        self.progress = "mdファイルを生成しています"
+        
+        // 音声ファイルのサイズ取得
+        let fileSize = try await self.getFileSize(filename: audioFilename)
+        self.setMarkdown(sizeStr: fileSize, audioFilename: audioFilename)
+        
+        return mdFilename;
     }
     
-    func SetMarkdown(sizeStr: String)
+    // ファイルを作成
+    func touch(filename: String) -> Void {
+        let task = Process()
+        // 起動するプログラムを絶対パスで指定
+        task.launchPath = "/usr/bin/touch"
+        // オプションを指定
+        task.arguments = ["\(mdRootPath)/\(filename)"]
+        // コマンド実行
+        task.launch()
+    }
+    
+    func setMarkdown(sizeStr: String, audioFilename: String)
     {
         // サイズをMB表記に変換
         let size = String(format: "%.01f", Float(sizeStr)! / 1000000)
         
         // 音声の長さを取得
-        let audioFilename = GetAudioName(episodeNumber: episodeNumber)
         let asset = AVURLAsset(url: URL(fileURLWithPath: "\(self.audioRootPath)/\(audioFilename)"))
         let duration = Double(CMTimeGetSeconds(asset.duration))
         
@@ -241,7 +234,7 @@ struct TabAView: View {
         
         SaveTextFile(filePath: filePath, message: message)
     }
-    
+
     
     var body: some View {
         VStack {
@@ -251,7 +244,7 @@ struct TabAView: View {
                     Text("ファイル") .frame(width: 100)
                     Text("\(self.audioPath)").frame(maxWidth: .infinity)
                     Button(action: {
-                        self.audioPath = TabAView.OpenAudio()
+                        self.audioPath = openAudio()
                     }) {
                         Text("オーディオファイルを開く")
                     }
