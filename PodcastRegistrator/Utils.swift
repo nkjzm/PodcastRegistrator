@@ -3,6 +3,7 @@ import SwiftUI
 
 var repositoryRootPath: String { UserDefaults.standard.string(forKey: "repositoryRootPath")! }
 var artworkPath: String { UserDefaults.standard.string(forKey: "artworkPath")! }
+var bgmPath: String { UserDefaults.standard.string(forKey: "bmgPath")! }
 
 var gitRootPath: String { "\(repositoryRootPath)/docs" }
 

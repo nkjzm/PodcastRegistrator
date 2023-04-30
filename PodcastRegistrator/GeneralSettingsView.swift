@@ -12,6 +12,7 @@ struct GeneralSettingsView: View {
     
     @AppStorage("repositoryRootPath") var gitRootPath: String = "/Users/nkjzm/Projects/xrfm.github.io"
     @AppStorage("artworkPath") var artworkPath: String = "/Users/nkjzm/Dropbox/xrpodcast.png"
+    @AppStorage("bmgPath") var bmgPath: String = ""
     
     var body: some View {
         VStack (spacing: 10) {
@@ -40,6 +41,15 @@ struct GeneralSettingsView: View {
                             Text("アートワーク画像を選択")
                         }.frame(maxWidth: .infinity)
                     }
+                }
+            }
+            HStack(alignment: .center) {
+                Text("ファイル") .frame(width: 100)
+                Text("\(self.bmgPath)").frame(maxWidth: .infinity)
+                Button(action: {
+                    self.bmgPath = openAudio()
+                }) {
+                    Text("オーディオファイルを選択")
                 }
             }
             
