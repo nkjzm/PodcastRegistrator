@@ -60,7 +60,8 @@ struct UploadView: View {
     }
     
     @State var createdFiles: [String] = []
-    
+    @State private var showAlert = false
+
     // 一連の処理を実行する
     func execute() -> Void {
         Task {
@@ -108,6 +109,12 @@ struct UploadView: View {
                     print("実行：removeFiles")
                     updateProgress(index: 9)
                     try await removeFiles()
+                }
+            
+                // ファイルの存在確認
+                if(!fileExists(at: outputAudioPath)){
+                    showAlert.toggle()
+                    return
                 }
                 
                 // mdファイルを作成
@@ -268,15 +275,17 @@ struct UploadView: View {
             task.terminationHandler = { _ in
                 let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
                 let output = String(data: outputData, encoding: .utf8)
-                print(output)
                 let arr: [String] = output!.components(separatedBy: " ")
-                print(arr)
-                
                 continuation.resume(returning: arr[1])
             }
             
             task.launch()
         }
+    }
+    
+    func fileExists(at filePath: String) -> Bool {
+        let fileManager = FileManager.default
+        return fileManager.fileExists(atPath: filePath)
     }
     
     // GitHubリポジトリにアップロード
@@ -314,11 +323,8 @@ struct UploadView: View {
         // mdファイルを作成
         self.touch(filename: mdFilename)
         
-        print("これから")
         // 音声ファイルのサイズ取得
         let fileSize = try await self.getFileSize(filePath: "\(audioRootPath)/\(audioFilename)")
-        print("ここまで")
-        print(fileSize)
         self.setMarkdown(sizeStr: fileSize, audioFilename: audioFilename)
         
         return mdFilename;
@@ -455,6 +461,17 @@ struct UploadView: View {
                 Spacer()
             }.frame(width: 400)
         }
+        .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text("エラー"),
+                    message: Text("音声ファイルが正常に生成されていないようです"),
+                    dismissButton: .default(Text("OK"), action: {
+                        // OKボタンが押された後に実行される処理をここに記述します。
+                        updateProgress(index: 0)
+                        showAlert.toggle()
+                    })
+                )
+            }
     }
 }
 
