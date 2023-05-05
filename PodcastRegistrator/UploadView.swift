@@ -6,7 +6,7 @@ struct UploadView: View {
     
     @State private var enableConvert: Bool = true
     @AppStorage("episodeNumber") private var episodeNumber: Int = 0
-    @State private var audioPath: String = "未選択"
+    @AppStorage("audioPath") private var audioPath: String = "未選択"
     @AppStorage("title") private var title: String = ""
     @AppStorage("description") private var description: String = ""
     @State private var content: String = """
@@ -26,7 +26,14 @@ struct UploadView: View {
     @State private var progressTexts: [String] = [
         "",
         "開始しました",
-        "音声ファイルを変換しています",
+        "ノイズ除去の事前ファイル作成しています",
+        "ノイズ除去をしています",
+        "無音区間を削除しています",
+        "BGMを追加しています",
+        "mp3に変換しています",
+        "アートワークを設定しています",
+        "ファイル名を設定しています",
+        "不要なファイルを削除しています",
         "mdファイルを生成しています",
         "アップロード中",
         "完了",
@@ -63,28 +70,55 @@ struct UploadView: View {
                 let audioFilename = GetAudioName(episodeNumber: episodeNumber)
                 
                 // 変換後のパスを代入する変数
-                var outputAudioPath = audioPath
-                
+                var outputAudioPath = "\"\(audioPath)\""
+                print(outputAudioPath)
+                                
                 if(enableConvert) {
+                    print("実行：makeNoiseProf")
                     updateProgress(index: 2)
                     let noiseProf = try await makeNoiseProf(audioPath: outputAudioPath)
+                    
+                    print("実行：removeNoise")
+                    updateProgress(index: 3)
                     outputAudioPath = try await removeNoise(audioPath: outputAudioPath, noiseProf: noiseProf)
+
+                    print("実行：removeSilence")
+                    updateProgress(index: 4)
                     outputAudioPath = try await removeSilence(audioPath: outputAudioPath)
+
+                    print("実行：addBgm")
+                    updateProgress(index: 5)
                     outputAudioPath = try await addBgm(audioPath: outputAudioPath)
+
+                    print("実行：convertToMp3")
+                    updateProgress(index: 6)
                     outputAudioPath = try await convertToMp3(audioPath: outputAudioPath)
-                    try await rename(audioPath: outputAudioPath, outputFileName: audioFilename)
+
+                    print("実行：addArtwork")
+                    updateProgress(index: 7)
+                    outputAudioPath = try await addArtwork(audioPath: outputAudioPath)
+
+                    print("実行：rename")
+                    updateProgress(index: 8)
+                    outputAudioPath = try await rename(audioPath: outputAudioPath, outputFileName: audioFilename)
+
+                    // リネーム元のファイル名をリストから消す
+                    self.createdFiles.removeLast()
+
+                    print("実行：removeFiles")
+                    updateProgress(index: 9)
                     try await removeFiles()
                 }
                 
                 // mdファイルを作成
-                updateProgress(index: 3)
+                updateProgress(index: 10)
                 let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
                 
                 // Gitリポジトリにアップロード
-                updateProgress(index: 4)
+                updateProgress(index: 11)
                 // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
                 
-                updateProgress(index: 5)
+                updateProgress(index: 12)
             }catch {
                 print("Error: \(error)")
             }
@@ -97,7 +131,7 @@ struct UploadView: View {
             let task = Process()
             task.launchPath = "/bin/sh"
             let noiseProf: String = "\"\(gitRootPath)/noise.prof\""
-            let createNoiseprofArg = "/usr/local/bin/sox \"\(audioPath)\" -n noiseprof \(noiseProf);"
+            let createNoiseprofArg = "/usr/local/bin/sox \(audioPath) -n noiseprof \(noiseProf);"
             task.arguments = ["-c", createNoiseprofArg]
             task.terminationHandler = { _ in
                 self.createdFiles.append(noiseProf)
@@ -113,7 +147,7 @@ struct UploadView: View {
             let task = Process()
             task.launchPath = "/bin/sh"
             let noiseRemoved: String = "\"\(gitRootPath)/noise_removed.wav\""
-            let removeNoiseArg = "/usr/local/bin/sox \"\(audioPath)\" \(noiseRemoved) noisered \(noiseProf) 0.2;"
+            let removeNoiseArg = "/usr/local/bin/sox \(audioPath) \(noiseRemoved) noisered \(noiseProf) 0.2;"
             //let compressArg = "/usr/local/bin/sox \(noiseRemoved) \(gitRootPath)/compressed.wav\" compand 0.01,1 -90,-90,-70,-70,-60,-20,0,0 -5;"
             task.arguments = ["-c", removeNoiseArg]
             task.terminationHandler = { _ in
@@ -147,7 +181,7 @@ struct UploadView: View {
             task.launchPath = "/bin/sh"
             let bgmAdded: String = "\"\(gitRootPath)/bgm_added.wav\""
             // $ ffmpeg -i /Users/nkjzm/Downloads/origin.m4a -stream_loop -1  -i /Users/nkjzm/Downloads/bgm.mp3  -filter_complex "[0]adelay=1000[a0];adelay=2000[a1];[a0][a1]amix=inputs=2:duration=shortest:weights=1 0.5[a]" -map "[a]" out.mp3
-            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0][a0];[a1];[a0][a1]amix=inputs=2:duration=shortest:weights=1 0.5[a]\" -map \"[a]\" \(bgmAdded)"
+            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0:a][1:a]amix=inputs=2:duration=shortest:weights=1 0.5[a]\" -map \"[a]\" \(bgmAdded)"
             task.arguments = ["-c", bgmArg]
             task.terminationHandler = { _ in
                 self.createdFiles.append(bgmAdded)
@@ -162,12 +196,12 @@ struct UploadView: View {
         return try await withCheckedThrowingContinuation { continuation in
             let task = Process()
             task.launchPath = "/bin/sh"
-            let bgmAdded: String = "\"\(gitRootPath)/bgm_added.wav\""
-            let convertArg = "/usr/local/bin/ffmpeg -i \(bgmAdded) -f mp3 -b:a 192k \(audioPath) -y;"
+            let converted: String = "\"\(gitRootPath)/converted.mp3\""
+            let convertArg = "/usr/local/bin/ffmpeg -i \(audioPath) -f mp3 -b:a 192k \(converted) -y;"
             task.arguments = ["-c", convertArg]
             task.terminationHandler = { _ in
-                self.createdFiles.append(bgmAdded)
-                continuation.resume(returning: bgmAdded)
+                self.createdFiles.append(converted)
+                continuation.resume(returning: converted)
             }
             task.launch()
         }
@@ -178,7 +212,7 @@ struct UploadView: View {
         return try await withCheckedThrowingContinuation { continuation in
             let task = Process()
             task.launchPath = "/bin/sh"
-            let artworkAdded: String = "\"\(gitRootPath)/bgm_added.wav\""
+            let artworkAdded: String = "\"\(gitRootPath)/artwork_added.mp3\""
             let addArtworkArg = "/usr/local/bin/ffmpeg -i \(audioPath) -i \(artworkPath) -disposition:v:1 attached_pic -map 0 -map 1 -c copy -id3v2_version 3 -metadata:s:v title=\"Album cover\" -metadata:s:v comment=\"Cover (front)\" \(artworkAdded);"
             task.arguments = ["-c", addArtworkArg]
             task.terminationHandler = { _ in
@@ -190,17 +224,15 @@ struct UploadView: View {
     }
     
     // リネーム
-    func rename(audioPath: String, outputFileName: String) async throws -> Void {
+    func rename(audioPath: String, outputFileName: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             let task = Process()
             task.launchPath = "/bin/sh"
-            let renamed: String = "\"\(gitRootPath)/\(outputFileName)\""
+            let renamed: String = "\"\(audioRootPath)/\(outputFileName)\""
             let renameArg = "mv \(audioPath) \(renamed);"
             task.arguments = ["-c", renameArg]
             task.terminationHandler = { _ in
-                // リネーム元のファイル名をリストから消す
-                self.createdFiles.removeLast()
-                continuation.resume()
+                continuation.resume(returning: renamed)
             }
             task.launch()
         }
@@ -225,17 +257,20 @@ struct UploadView: View {
     }
     
     // ファイルサイズを取得する
-    func getFileSize(filename: String) async throws -> String {
+    func getFileSize(filePath: String) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
             let task = Process()
             task.launchPath = "/usr/bin/wc"
-            task.arguments = ["-c", "\(audioRootPath)/\(filename)"]
+            // パスが二重引用符で囲まれていると失敗する
+            task.arguments = ["-c", filePath.replacingOccurrences(of: "\"", with: "")]
             let outputPipe = Pipe()
             task.standardOutput = outputPipe
             task.terminationHandler = { _ in
                 let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
                 let output = String(data: outputData, encoding: .utf8)
+                print(output)
                 let arr: [String] = output!.components(separatedBy: " ")
+                print(arr)
                 
                 continuation.resume(returning: arr[1])
             }
@@ -279,8 +314,11 @@ struct UploadView: View {
         // mdファイルを作成
         self.touch(filename: mdFilename)
         
+        print("これから")
         // 音声ファイルのサイズ取得
-        let fileSize = try await self.getFileSize(filename: audioFilename)
+        let fileSize = try await self.getFileSize(filePath: "\(audioRootPath)/\(audioFilename)")
+        print("ここまで")
+        print(fileSize)
         self.setMarkdown(sizeStr: fileSize, audioFilename: audioFilename)
         
         return mdFilename;
@@ -299,6 +337,7 @@ struct UploadView: View {
     
     func setMarkdown(sizeStr: String, audioFilename: String)
     {
+        print(sizeStr)
         // サイズをMB表記に変換
         let size = String(format: "%.01f", Float(sizeStr)! / 1000000)
         
@@ -412,6 +451,7 @@ struct UploadView: View {
                         
                     }.padding().frame(maxWidth: .infinity)
                 }
+
                 Spacer()
             }.frame(width: 400)
         }
