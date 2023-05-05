@@ -75,6 +75,8 @@ struct UploadView: View {
     func execute() -> Void {
         Task {
             do {
+                updateProgress(index: 0)
+
                 updateProgress()
                 
                 let audioFilename = GetAudioName(episodeNumber: episodeNumber)
@@ -204,7 +206,7 @@ struct UploadView: View {
             task.launchPath = "/bin/sh"
             let bgmAdded: String = "\"\(gitRootPath)/bgm_added.wav\""
             // $ ffmpeg -i /Users/nkjzm/Downloads/origin.m4a -stream_loop -1  -i /Users/nkjzm/Downloads/bgm.mp3  -filter_complex "[0]adelay=1000[a0];adelay=2000[a1];[a0][a1]amix=inputs=2:duration=shortest:weights=1 0.5[a]" -map "[a]" out.mp3
-            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0:a][1:a]amix=inputs=2:duration=shortest:weights=1 0.5[a]\" -map \"[a]\" \(bgmAdded)"
+            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0:a][1:a]amix=inputs=2:duration=shortest:weights=1 0.3[a]\" -map \"[a]\" \(bgmAdded)"
             task.arguments = ["-c", bgmArg]
             task.terminationHandler = { _ in
                 self.createdFiles.append(bgmAdded)
@@ -472,7 +474,9 @@ struct UploadView: View {
             }.padding().frame(width: 400)
             VStack {
                 Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
-                ProgressView().padding()
+                if(progressIndex != 0 && progressIndex != (progressTexts.count - 1)){
+                    ProgressView().padding()
+                }
                 Button("アップロード", action: {self.execute()} ).padding()
                 HStack{
                     CircularProgressBar(progress: $progressValue)
@@ -497,7 +501,6 @@ struct UploadView: View {
                     title: Text("エラー"),
                     message: Text("音声ファイルが正常に生成されていないようです"),
                     dismissButton: .default(Text("OK"), action: {
-                        // OKボタンが押された後に実行される処理をここに記述します。
                         updateProgress(index: 0)
                         showAlert.toggle()
                     })
