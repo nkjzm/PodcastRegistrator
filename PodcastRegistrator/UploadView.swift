@@ -55,9 +55,17 @@ struct UploadView: View {
     @State var progressIndex: Int = 0
     @State var progressValue: CGFloat = 0
     
+    func updateProgress() -> Void {
+        updateProgress(index: progressIndex + 1)
+    }
+    
     func updateProgress(index: Int) -> Void {
         progressIndex = index
         progressValue = CGFloat(index) / CGFloat(progressTexts.count - 1)
+    }
+    
+    func endProgress() -> Void {
+        updateProgress(index: progressTexts.count - 1)
     }
     
     @State var createdFiles: [String] = []
@@ -67,7 +75,7 @@ struct UploadView: View {
     func execute() -> Void {
         Task {
             do {
-                updateProgress(index: 1)
+                updateProgress()
                 
                 let audioFilename = GetAudioName(episodeNumber: episodeNumber)
                 
@@ -75,7 +83,7 @@ struct UploadView: View {
                 var outputAudioPath = "\"\(audioPath)\""
                 print(outputAudioPath)
                 
-                updateProgress(index: 2)
+                updateProgress()
                 if(outputAudioPath.contains(".mkv")){
                     print("実行：convertToWav")
                     outputAudioPath = try await convertToWav(mkvPath: outputAudioPath)
@@ -83,38 +91,38 @@ struct UploadView: View {
                                 
                 if(enableConvert) {
                     print("実行：makeNoiseProf")
-                    updateProgress(index: 3)
+                    updateProgress()
                     let noiseProf = try await makeNoiseProf(audioPath: outputAudioPath)
                     
                     print("実行：removeNoise")
-                    updateProgress(index: 4)
+                    updateProgress()
                     outputAudioPath = try await removeNoise(audioPath: outputAudioPath, noiseProf: noiseProf)
 
                     print("実行：removeSilence")
-                    updateProgress(index: 5)
+                    updateProgress()
                     outputAudioPath = try await removeSilence(audioPath: outputAudioPath)
 
                     print("実行：addBgm")
-                    updateProgress(index: 6)
+                    updateProgress()
                     outputAudioPath = try await addBgm(audioPath: outputAudioPath)
 
                     print("実行：convertToMp3")
-                    updateProgress(index: 7)
+                    updateProgress()
                     outputAudioPath = try await convertToMp3(audioPath: outputAudioPath)
 
                     print("実行：addArtwork")
-                    updateProgress(index: 8)
+                    updateProgress()
                     outputAudioPath = try await addArtwork(audioPath: outputAudioPath)
 
                     print("実行：rename")
-                    updateProgress(index: 9)
+                    updateProgress()
                     outputAudioPath = try await rename(audioPath: outputAudioPath, outputFileName: audioFilename)
 
                     // リネーム元のファイル名をリストから消す
                     self.createdFiles.removeLast()
 
                     print("実行：removeFiles")
-                    updateProgress(index: 10)
+                    updateProgress()
                     try await removeFiles()
                 }
             
@@ -126,14 +134,14 @@ struct UploadView: View {
                 }
                 
                 // mdファイルを作成
-                updateProgress(index: 11)
+                updateProgress()
                 let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
                 
                 // Gitリポジトリにアップロード
-                updateProgress(index: 12)
+                updateProgress()
                 // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
                 
-                updateProgress(index: 13)
+                endProgress()
             }catch {
                 print("Error: \(error)")
             }
