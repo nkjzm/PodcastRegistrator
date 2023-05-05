@@ -23,12 +23,15 @@ struct UploadView: View {
     ]
     
     @State private var enableConvert: Bool = true
-        
+    @State private var enableGitUpload: Bool = true
+    
     func getProgressText() -> [String] {
         var progressTexts = [""]
         progressTexts.append("開始しました");
-        if(enableConvert){
+        if(audioPath.contains(".mkv")){
             progressTexts.append("wavファイルを準備しています")
+        }
+        if(enableConvert){
             progressTexts.append("ノイズ除去の事前ファイル作成しています")
             progressTexts.append("ノイズ除去をしています")
             progressTexts.append("無音区間を削除しています")
@@ -39,7 +42,9 @@ struct UploadView: View {
             progressTexts.append("不要なファイルを削除しています")
         }
         progressTexts.append("mdファイルを生成しています")
-        progressTexts.append("アップロード中")
+        if(enableGitUpload){
+            progressTexts.append("アップロード中")
+        }
         progressTexts.append("完了")
         
         return progressTexts;
@@ -75,7 +80,7 @@ struct UploadView: View {
     
     @State var createdFiles: [String] = []
     @State private var showAlert = false
-
+    
     // 一連の処理を実行する
     func execute() -> Void {
         Task {
@@ -90,9 +95,9 @@ struct UploadView: View {
                 var outputAudioPath = "\"\(audioPath)\""
                 print(outputAudioPath)
                 
-                updateProgress()
-                if(outputAudioPath.contains(".mkv")){
+                if(audioPath.contains(".mkv")){
                     print("実行：convertToWav")
+                    updateProgress()
                     outputAudioPath = try await convertToWav(mkvPath: outputAudioPath)
                 }
                 
@@ -144,10 +149,12 @@ struct UploadView: View {
                 updateProgress()
                 let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
                 
-                // Gitリポジトリにアップロード
-                updateProgress()
-                // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
-                
+                if(enableGitUpload){
+                    // Gitリポジトリにアップロード
+                    updateProgress()
+                    try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
+                }
+                    
                 endProgress()
             }catch {
                 print("Error: \(error)")
@@ -211,7 +218,7 @@ struct UploadView: View {
             task.launchPath = "/bin/sh"
             let bgmAdded: String = "\"\(gitRootPath)/bgm_added.wav\""
             // $ ffmpeg -i /Users/nkjzm/Downloads/origin.m4a -stream_loop -1  -i /Users/nkjzm/Downloads/bgm.mp3  -filter_complex "[0]adelay=1000[a0];adelay=2000[a1];[a0][a1]amix=inputs=2:duration=shortest:weights=1 0.5[a]" -map "[a]" out.mp3
-            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0:a][1:a]amix=inputs=2:duration=shortest:weights=1 0.3[a]\" -map \"[a]\" \(bgmAdded)"
+            let bgmArg = "/usr/local/bin/ffmpeg -i \(audioPath) -stream_loop -1 -i \(bgmPath) -filter_complex \"[0:a][1:a]amix=inputs=2:duration=shortest:weights=1 0.15[a]\" -map \"[a]\" \(bgmAdded)"
             task.arguments = ["-c", bgmArg]
             task.terminationHandler = { _ in
                 self.createdFiles.append(bgmAdded)
@@ -480,9 +487,14 @@ struct UploadView: View {
             VStack {
                 Spacer()
                 HStack{
-                    CircularProgressBar(progress: $progressValue)
-                        .frame(width: 100, height: 100)
-                        .padding(32.0)
+                    VStack{
+                        CircularProgressBar(progress: $progressValue)
+                            .frame(width: 100, height: 100)
+                            .padding(32.0)
+                        if(progressIndex != 0 && progressIndex != (getProgressText().count - 1)){
+                            ProgressView().padding()
+                        }
+                    }
                     VStack(alignment: .leading, spacing: 10) {
                         ForEach(1..<getProgressText().count, id: \.self) { num in
                             let style = num < progressIndex ? doneStyle : ( num == progressIndex ? doingStyle : todoStyle)
@@ -494,9 +506,9 @@ struct UploadView: View {
                         
                     }.padding().frame(maxWidth: .infinity)
                 }
-                Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
-                if(progressIndex != 0 && progressIndex != (getProgressText().count - 1)){
-                    ProgressView().padding()
+                Form{
+                    Toggle("変換処理を有効にする", isOn: $enableConvert).toggleStyle(.switch)
+                    Toggle("アップロードを有効にする", isOn: $enableGitUpload).toggleStyle(.switch)
                 }
                 Button("アップロード", action: {self.execute()} ).padding()
             }.frame(width: 400)
