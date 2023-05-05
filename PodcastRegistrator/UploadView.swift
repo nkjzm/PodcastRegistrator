@@ -26,6 +26,7 @@ struct UploadView: View {
     @State private var progressTexts: [String] = [
         "",
         "開始しました",
+        "wavファイルを準備しています",
         "ノイズ除去の事前ファイル作成しています",
         "ノイズ除去をしています",
         "無音区間を削除しています",
@@ -73,59 +74,66 @@ struct UploadView: View {
                 // 変換後のパスを代入する変数
                 var outputAudioPath = "\"\(audioPath)\""
                 print(outputAudioPath)
+                
+                updateProgress(index: 2)
+                if(outputAudioPath.contains(".mkv")){
+                    print("実行：convertToWav")
+                    outputAudioPath = try await convertToWav(mkvPath: outputAudioPath)
+                }
                                 
                 if(enableConvert) {
                     print("実行：makeNoiseProf")
-                    updateProgress(index: 2)
+                    updateProgress(index: 3)
                     let noiseProf = try await makeNoiseProf(audioPath: outputAudioPath)
                     
                     print("実行：removeNoise")
-                    updateProgress(index: 3)
+                    updateProgress(index: 4)
                     outputAudioPath = try await removeNoise(audioPath: outputAudioPath, noiseProf: noiseProf)
 
                     print("実行：removeSilence")
-                    updateProgress(index: 4)
+                    updateProgress(index: 5)
                     outputAudioPath = try await removeSilence(audioPath: outputAudioPath)
 
                     print("実行：addBgm")
-                    updateProgress(index: 5)
+                    updateProgress(index: 6)
                     outputAudioPath = try await addBgm(audioPath: outputAudioPath)
 
                     print("実行：convertToMp3")
-                    updateProgress(index: 6)
+                    updateProgress(index: 7)
                     outputAudioPath = try await convertToMp3(audioPath: outputAudioPath)
 
                     print("実行：addArtwork")
-                    updateProgress(index: 7)
+                    updateProgress(index: 8)
                     outputAudioPath = try await addArtwork(audioPath: outputAudioPath)
 
                     print("実行：rename")
-                    updateProgress(index: 8)
+                    updateProgress(index: 9)
                     outputAudioPath = try await rename(audioPath: outputAudioPath, outputFileName: audioFilename)
 
                     // リネーム元のファイル名をリストから消す
                     self.createdFiles.removeLast()
 
                     print("実行：removeFiles")
-                    updateProgress(index: 9)
+                    updateProgress(index: 10)
                     try await removeFiles()
                 }
             
                 // ファイルの存在確認
-                if(!fileExists(at: outputAudioPath)){
+                if(!fileExists(filePath: outputAudioPath)){
+                    print(outputAudioPath)
                     showAlert.toggle()
                     return
                 }
                 
                 // mdファイルを作成
-                updateProgress(index: 10)
+                updateProgress(index: 11)
                 let mdFilename = try await self.makeMarkdown(audioFilename: audioFilename)
                 
                 // Gitリポジトリにアップロード
-                updateProgress(index: 11)
+                updateProgress(index: 12)
                 // try await self.uoloadToGitHub(audioFilename: audioFilename, mdFilename: mdFilename,count:episodeNumber)
                 
-                updateProgress(index: 12)
+                updateProgress(index: 13)
             }catch {
                 print("Error: \(error)")
             }
@@ -193,6 +201,22 @@ struct UploadView: View {
             task.terminationHandler = { _ in
                 self.createdFiles.append(bgmAdded)
                 continuation.resume(returning: bgmAdded)
+            }
+            task.launch()
+        }
+    }
+    
+    // wavに変換
+    func convertToWav(mkvPath: String) async throws -> String {
+        return try await withCheckedThrowingContinuation { continuation in
+            let task = Process()
+            task.launchPath = "/bin/sh"
+            let converted: String = "\"\(gitRootPath)/converted.wav\""
+            let convertArg = "/usr/local/bin/ffmpeg -i \(mkvPath) -vn -c:a pcm_s16le \(converted);"
+            task.arguments = ["-c", convertArg]
+            task.terminationHandler = { _ in
+                self.createdFiles.append(converted)
+                continuation.resume(returning: converted)
             }
             task.launch()
         }
@@ -283,9 +307,9 @@ struct UploadView: View {
         }
     }
     
-    func fileExists(at filePath: String) -> Bool {
+    func fileExists(filePath: String) -> Bool {
         let fileManager = FileManager.default
-        return fileManager.fileExists(atPath: filePath)
+        return fileManager.fileExists(atPath: filePath.replacingOccurrences(of: "\"", with: ""))
     }
     
     // GitHubリポジトリにアップロード
@@ -402,7 +426,7 @@ struct UploadView: View {
                         Button(action: {
                             self.audioPath = openAudio()
                         }) {
-                            Text("オーディオファイルを開く")
+                            Text("ファイルを開く")
                         }
                     }
                     HStack(alignment: .center) {
@@ -440,13 +464,13 @@ struct UploadView: View {
             }.padding().frame(width: 400)
             VStack {
                 Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
+                ProgressView().padding()
                 Button("アップロード", action: {self.execute()} ).padding()
                 HStack{
                     CircularProgressBar(progress: $progressValue)
                         .frame(width: 100, height: 100)
                         .padding(32.0)
                     VStack(alignment: .leading, spacing: 10) {
-                        
                         ForEach(1..<progressTexts.count, id: \.self) { num in
                             let style = num < progressIndex ? doneStyle : ( num == progressIndex ? doingStyle : todoStyle)
                             Label(
@@ -457,7 +481,6 @@ struct UploadView: View {
                         
                     }.padding().frame(maxWidth: .infinity)
                 }
-
                 Spacer()
             }.frame(width: 400)
         }
