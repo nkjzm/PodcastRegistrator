@@ -4,7 +4,6 @@ import AVFoundation
 
 struct UploadView: View {
     
-    @State private var enableConvert: Bool = true
     @AppStorage("episodeNumber") private var episodeNumber: Int = 0
     @AppStorage("audioPath") private var audioPath: String = "未選択"
     @AppStorage("title") private var title: String = ""
@@ -23,22 +22,28 @@ struct UploadView: View {
         "",
     ]
     
-    @State private var progressTexts: [String] = [
-        "",
-        "開始しました",
-        "wavファイルを準備しています",
-        "ノイズ除去の事前ファイル作成しています",
-        "ノイズ除去をしています",
-        "無音区間を削除しています",
-        "BGMを追加しています",
-        "mp3に変換しています",
-        "アートワークを設定しています",
-        "ファイル名を設定しています",
-        "不要なファイルを削除しています",
-        "mdファイルを生成しています",
-        "アップロード中",
-        "完了",
-    ]
+    @State private var enableConvert: Bool = true
+        
+    func getProgressText() -> [String] {
+        var progressTexts = [""]
+        progressTexts.append("開始しました");
+        if(enableConvert){
+            progressTexts.append("wavファイルを準備しています")
+            progressTexts.append("ノイズ除去の事前ファイル作成しています")
+            progressTexts.append("ノイズ除去をしています")
+            progressTexts.append("無音区間を削除しています")
+            progressTexts.append("BGMを追加しています")
+            progressTexts.append("mp3に変換しています")
+            progressTexts.append("アートワークを設定しています")
+            progressTexts.append("ファイル名を設定しています")
+            progressTexts.append("不要なファイルを削除しています")
+        }
+        progressTexts.append("mdファイルを生成しています")
+        progressTexts.append("アップロード中")
+        progressTexts.append("完了")
+        
+        return progressTexts;
+    }
     
     struct progressStyle {
         var textColor : Color
@@ -61,11 +66,11 @@ struct UploadView: View {
     
     func updateProgress(index: Int) -> Void {
         progressIndex = index
-        progressValue = CGFloat(index) / CGFloat(progressTexts.count - 1)
+        progressValue = CGFloat(index) / CGFloat(getProgressText().count - 1)
     }
     
     func endProgress() -> Void {
-        updateProgress(index: progressTexts.count - 1)
+        updateProgress(index: getProgressText().count - 1)
     }
     
     @State var createdFiles: [String] = []
@@ -76,7 +81,7 @@ struct UploadView: View {
         Task {
             do {
                 updateProgress(index: 0)
-
+                
                 updateProgress()
                 
                 let audioFilename = GetAudioName(episodeNumber: episodeNumber)
@@ -90,7 +95,7 @@ struct UploadView: View {
                     print("実行：convertToWav")
                     outputAudioPath = try await convertToWav(mkvPath: outputAudioPath)
                 }
-                                
+                
                 if(enableConvert) {
                     print("実行：makeNoiseProf")
                     updateProgress()
@@ -99,35 +104,35 @@ struct UploadView: View {
                     print("実行：removeNoise")
                     updateProgress()
                     outputAudioPath = try await removeNoise(audioPath: outputAudioPath, noiseProf: noiseProf)
-
+                    
                     print("実行：removeSilence")
                     updateProgress()
                     outputAudioPath = try await removeSilence(audioPath: outputAudioPath)
-
+                    
                     print("実行：addBgm")
                     updateProgress()
                     outputAudioPath = try await addBgm(audioPath: outputAudioPath)
-
+                    
                     print("実行：convertToMp3")
                     updateProgress()
                     outputAudioPath = try await convertToMp3(audioPath: outputAudioPath)
-
+                    
                     print("実行：addArtwork")
                     updateProgress()
                     outputAudioPath = try await addArtwork(audioPath: outputAudioPath)
-
+                    
                     print("実行：rename")
                     updateProgress()
                     outputAudioPath = try await rename(audioPath: outputAudioPath, outputFileName: audioFilename)
-
+                    
                     // リネーム元のファイル名をリストから消す
                     self.createdFiles.removeLast()
-
+                    
                     print("実行：removeFiles")
                     updateProgress()
                     try await removeFiles()
                 }
-            
+                
                 // ファイルの存在確認
                 if(!fileExists(filePath: outputAudioPath)){
                     print(outputAudioPath)
@@ -473,39 +478,39 @@ struct UploadView: View {
                 }.padding(.leading)
             }.padding().frame(width: 400)
             VStack {
-                Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
-                if(progressIndex != 0 && progressIndex != (progressTexts.count - 1)){
-                    ProgressView().padding()
-                }
-                Button("アップロード", action: {self.execute()} ).padding()
+                Spacer()
                 HStack{
                     CircularProgressBar(progress: $progressValue)
                         .frame(width: 100, height: 100)
                         .padding(32.0)
                     VStack(alignment: .leading, spacing: 10) {
-                        ForEach(1..<progressTexts.count, id: \.self) { num in
+                        ForEach(1..<getProgressText().count, id: \.self) { num in
                             let style = num < progressIndex ? doneStyle : ( num == progressIndex ? doingStyle : todoStyle)
                             Label(
-                                title: { Text(progressTexts[num]).foregroundColor(style.textColor).fontWeight(style.fontWeight) },
+                                title: { Text(getProgressText()[num]).foregroundColor(style.textColor).fontWeight(style.fontWeight) },
                                 icon: { Image(systemName: "circlebadge.fill").foregroundColor(style.imageColor)}
                             )
                         }
                         
                     }.padding().frame(maxWidth: .infinity)
                 }
-                Spacer()
+                Toggle("変換処理を有効にする", isOn: $enableConvert).padding().toggleStyle(.switch)
+                if(progressIndex != 0 && progressIndex != (getProgressText().count - 1)){
+                    ProgressView().padding()
+                }
+                Button("アップロード", action: {self.execute()} ).padding()
             }.frame(width: 400)
         }
         .alert(isPresented: $showAlert) {
-                Alert(
-                    title: Text("エラー"),
-                    message: Text("音声ファイルが正常に生成されていないようです"),
-                    dismissButton: .default(Text("OK"), action: {
-                        updateProgress(index: 0)
-                        showAlert.toggle()
-                    })
-                )
-            }
+            Alert(
+                title: Text("エラー"),
+                message: Text("音声ファイルが正常に生成されていないようです"),
+                dismissButton: .default(Text("OK"), action: {
+                    updateProgress(index: 0)
+                    showAlert.toggle()
+                })
+            )
+        }
     }
 }
 
