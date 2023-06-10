@@ -28,7 +28,7 @@ struct UploadView: View {
     func getProgressText() -> [String] {
         var progressTexts = [""]
         progressTexts.append("開始しました");
-        if(audioPath.contains(".mkv")){
+        if(audioPath.contains(".mkv") || audioPath.contains(".mp4")){
             progressTexts.append("wavファイルを準備しています")
         }
         if(enableConvert){
@@ -95,7 +95,7 @@ struct UploadView: View {
                 var outputAudioPath = "\"\(audioPath)\""
                 print(outputAudioPath)
                 
-                if(audioPath.contains(".mkv")){
+                if(audioPath.contains(".mkv") || audioPath.contains(".mp4")){
                     print("実行：convertToWav")
                     updateProgress()
                     outputAudioPath = try await convertToWav(mkvPath: outputAudioPath)

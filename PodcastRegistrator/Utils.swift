@@ -83,7 +83,7 @@ func openAudio() -> String {
     openPanel.canChooseDirectories = false //ディレクトリの選択
     openPanel.canCreateDirectories = false //ディレクトリの作成
     openPanel.canChooseFiles = true //ファイルの選択
-    openPanel.allowedFileTypes = ["wav", "mp3", "mkv"] //ファイルの種類
+    openPanel.allowedFileTypes = ["wav", "mp3", "mkv", "mp4"] //ファイルの種類
     
     let reault = openPanel.runModal()
     if(reault == NSApplication.ModalResponse.OK) {
